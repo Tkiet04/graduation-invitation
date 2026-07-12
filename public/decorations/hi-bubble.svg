@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 100" fill="none">
+  <path d="M20 55C20 30 45 12 70 18C95 24 108 48 98 70C90 88 60 95 40 88C28 84 20 72 20 55Z" stroke="white" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M38 82L28 98L48 86" stroke="white" stroke-width="3" stroke-linejoin="round"/>
+  <text x="58" y="58" text-anchor="middle" fill="white" font-family="Arial Black, Arial, sans-serif" font-size="28" font-weight="900">HI!</text>
+</svg>
