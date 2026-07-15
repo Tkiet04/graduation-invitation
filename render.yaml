@@ -7,5 +7,10 @@ services:
     startCommand: npm start
     healthCheckPath: /api/health
     envVars:
+      - key: NODE_VERSION
+        value: "20"
       - key: NODE_ENV
         value: production
+      # Dán connection string từ Neon (khuyến nghị) hoặc Render Postgres
+      - key: DATABASE_URL
+        sync: false

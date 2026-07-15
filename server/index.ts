@@ -1,9 +1,10 @@
+import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { UPLOADS_DIR } from './db.js'
+import { initDb, UPLOADS_DIR } from './db.js'
 import invitationsRouter from './routes/invitations.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -50,8 +51,16 @@ if (hasFrontend) {
   })
 }
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on port ${PORT}`)
-  console.log(`cwd: ${process.cwd()}`)
-  console.log(`dist: ${distPath} (exists: ${hasFrontend})`)
+async function main() {
+  await initDb()
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on port ${PORT}`)
+    console.log(`cwd: ${process.cwd()}`)
+    console.log(`dist: ${distPath} (exists: ${hasFrontend})`)
+  })
+}
+
+main().catch((err) => {
+  console.error('Failed to start server:', err)
+  process.exit(1)
 })
