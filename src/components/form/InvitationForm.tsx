@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import type { InvitationFormValues } from '@/types/invitation'
 import { DEMO_FORM, EMPTY_FORM } from '@/constants/invitationData'
 import { ImageUploadField } from '@/components/form/ImageUploadField'
+import { AudioUploadField } from '@/components/form/AudioUploadField'
 
 interface InvitationFormProps {
   initial?: InvitationFormValues
@@ -44,8 +45,8 @@ export function InvitationForm({
       setError('Vui lòng nhập ngày và giờ')
       return
     }
-    if (!values.locationText.trim() || !values.locationAddress.trim()) {
-      setError('Vui lòng nhập địa điểm và địa chỉ')
+    if (!values.locationAddress.trim()) {
+      setError('Vui lòng nhập địa chỉ map (LOCATION)')
       return
     }
     setError('')
@@ -62,7 +63,7 @@ export function InvitationForm({
     <form className="form-panel" onSubmit={handleSubmit}>
       <h2 className="form-panel__title">Tạo thư mời</h2>
       <p className="form-panel__desc">
-        Điền thông tin — xem trước bên cạnh — tạo QR riêng cho từng người nhận.
+        Thiết kế theo mẫu Graduation Ceremony — điền thông tin, xem trước, tạo QR.
       </p>
 
       <div className="form-grid form-grid--2">
@@ -72,7 +73,7 @@ export function InvitationForm({
             id="graduateName"
             value={values.graduateName}
             onChange={(e) => update('graduateName', e.target.value)}
-            placeholder="Thiên Ân"
+            placeholder="Nguyễn Tuấn Kiệt"
             required
           />
         </div>
@@ -89,6 +90,46 @@ export function InvitationForm({
         </div>
 
         <div className="form-field">
+          <label htmlFor="schoolCode">Mã trường (ruy-băng trái)</label>
+          <input
+            id="schoolCode"
+            value={values.schoolCode}
+            onChange={(e) => update('schoolCode', e.target.value)}
+            placeholder="UTC2"
+          />
+        </div>
+
+        <div className="form-field">
+          <label htmlFor="classCode">Khóa / lớp (ruy-băng phải)</label>
+          <input
+            id="classCode"
+            value={values.classCode}
+            onChange={(e) => update('classCode', e.target.value)}
+            placeholder="K63"
+          />
+        </div>
+
+        <div className="form-field">
+          <label htmlFor="cohortYears">Niên khóa</label>
+          <input
+            id="cohortYears"
+            value={values.cohortYears}
+            onChange={(e) => update('cohortYears', e.target.value)}
+            placeholder="2022-2026"
+          />
+        </div>
+
+        <div className="form-field">
+          <label htmlFor="major">Ngành (đáy ruy-băng phải)</label>
+          <input
+            id="major"
+            value={values.major}
+            onChange={(e) => update('major', e.target.value)}
+            placeholder="CÔNG NGHỆ THÔNG TIN"
+          />
+        </div>
+
+        <div className="form-field">
           <label htmlFor="date">Ngày</label>
           <input
             id="date"
@@ -100,7 +141,7 @@ export function InvitationForm({
         </div>
 
         <div className="form-field">
-          <label htmlFor="time">Giờ</label>
+          <label htmlFor="time">Giờ bắt đầu</label>
           <input
             id="time"
             type="time"
@@ -110,30 +151,51 @@ export function InvitationForm({
           />
         </div>
 
+        <div className="form-field">
+          <label htmlFor="timeEnd">Giờ kết thúc</label>
+          <input
+            id="timeEnd"
+            type="time"
+            value={values.timeEnd}
+            onChange={(e) => update('timeEnd', e.target.value)}
+          />
+        </div>
+
         <div className="form-field form-field--full">
-          <label htmlFor="locationText">Địa điểm (text)</label>
+          <label htmlFor="message">Lời nhắn</label>
+          <textarea
+            id="message"
+            rows={2}
+            value={values.message}
+            onChange={(e) => update('message', e.target.value)}
+            placeholder="Hy vọng trong bức tranh thanh xuân của tớ sẽ có sự góp mặt của cậu"
+          />
+        </div>
+
+        <div className="form-field form-field--full">
+          <label htmlFor="locationText">Tên trường (đầu thiệp)</label>
           <input
             id="locationText"
             value={values.locationText}
             onChange={(e) => update('locationText', e.target.value)}
-            placeholder="Sảnh A Trường Đại Học..."
+            placeholder="TRƯỜNG ĐẠI HỌC GIAO THÔNG VẬN TẢI - PHÂN HIỆU TẠI TP.HCM"
             required
           />
         </div>
 
         <div className="form-field form-field--full">
-          <label htmlFor="locationAddress">Địa chỉ</label>
+          <label htmlFor="locationAddress">Địa chỉ map (LOCATION)</label>
           <input
             id="locationAddress"
             value={values.locationAddress}
             onChange={(e) => update('locationAddress', e.target.value)}
-            placeholder="114 ngõ 23 đường Hồng Bàng..."
+            placeholder="450-451 Lê Văn Việt, P. Tăng Nhơn Phú A, TP. Thủ Đức, TP.HCM"
             required
           />
         </div>
 
         <div className="form-field form-field--full">
-          <label htmlFor="locationMap">Link Google Maps</label>
+          <label htmlFor="locationMap">Link Google Maps (nút Chỉ đường)</label>
           <input
             id="locationMap"
             type="url"
@@ -142,6 +204,13 @@ export function InvitationForm({
             placeholder="https://maps.google.com/..."
           />
         </div>
+
+        <AudioUploadField
+          label="Nhạc nền của bạn"
+          value={values.musicUrl}
+          onChange={(v) => update('musicUrl', v)}
+          hint="Upload mp3/wav (tối đa 5MB) hoặc dán link — để trống = nhạc mặc định"
+        />
 
         <div className="form-field form-field--full">
           <label htmlFor="contactInfo">Thông tin liên lạc</label>
@@ -154,18 +223,17 @@ export function InvitationForm({
         </div>
 
         <ImageUploadField
-          label="Ảnh nền (background)"
+          label="Ảnh nền lụa (tuỳ chọn)"
           value={values.backgroundImg}
           onChange={(v) => update('backgroundImg', v)}
-          hint="Ảnh phía sau (grayscale) — nên dùng ảnh chân dung"
+          hint="Để trống = nền lụa mặc định theo mẫu"
         />
 
         <ImageUploadField
-          label="Ảnh chính (foreground)"
+          label="Logo trường (tuỳ chọn)"
           value={values.mainImg}
           onChange={(v) => update('mainImg', v)}
-          floating
-          hint="Tự động tách nền khi upload — chỉ giữ người, nổi trên background như mẫu"
+          hint="Để trống = logo UTC chính thức (hình tròn)"
         />
       </div>
 

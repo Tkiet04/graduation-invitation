@@ -33,10 +33,17 @@ export interface InvitationRow {
   recipient_name: string
   date: string
   time: string
+  time_end: string
   location_text: string
   location_address: string
   location_map: string
   contact_info: string
+  message: string
+  school_code: string
+  class_code: string
+  cohort_years: string
+  major: string
+  music_url: string
   background_img: string
   main_img: string
   created_at: string | Date
@@ -48,10 +55,17 @@ export interface InvitationPayload {
   recipientName: string
   date: string
   time: string
+  timeEnd: string
   locationText: string
   locationAddress: string
   locationMap: string
   contactInfo: string
+  message: string
+  schoolCode: string
+  classCode: string
+  cohortYears: string
+  major: string
+  musicUrl: string
   backgroundImg: string
   mainImg: string
   createdAt: string
@@ -69,10 +83,17 @@ export function rowToRecord(row: InvitationRow): InvitationPayload {
     recipientName: row.recipient_name,
     date: row.date,
     time: row.time,
+    timeEnd: row.time_end ?? '',
     locationText: row.location_text,
     locationAddress: row.location_address,
     locationMap: row.location_map,
     contactInfo: row.contact_info,
+    message: row.message ?? '',
+    schoolCode: row.school_code ?? '',
+    classCode: row.class_code ?? '',
+    cohortYears: row.cohort_years ?? '',
+    major: row.major ?? '',
+    musicUrl: row.music_url ?? '',
     backgroundImg: row.background_img,
     mainImg: row.main_img,
     createdAt: toIso(row.created_at),
@@ -87,14 +108,36 @@ export async function initDb(): Promise<void> {
       recipient_name TEXT NOT NULL,
       date TEXT NOT NULL,
       time TEXT NOT NULL,
+      time_end TEXT NOT NULL DEFAULT '',
       location_text TEXT NOT NULL,
       location_address TEXT NOT NULL,
       location_map TEXT NOT NULL DEFAULT '',
       contact_info TEXT NOT NULL DEFAULT '',
+      message TEXT NOT NULL DEFAULT '',
+      school_code TEXT NOT NULL DEFAULT '',
+      class_code TEXT NOT NULL DEFAULT '',
+      cohort_years TEXT NOT NULL DEFAULT '',
+      major TEXT NOT NULL DEFAULT '',
+      music_url TEXT NOT NULL DEFAULT '',
       background_img TEXT NOT NULL DEFAULT '',
       main_img TEXT NOT NULL DEFAULT '',
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
   `)
+
+  const migrations = [
+    `ALTER TABLE invitations ADD COLUMN IF NOT EXISTS time_end TEXT NOT NULL DEFAULT ''`,
+    `ALTER TABLE invitations ADD COLUMN IF NOT EXISTS message TEXT NOT NULL DEFAULT ''`,
+    `ALTER TABLE invitations ADD COLUMN IF NOT EXISTS school_code TEXT NOT NULL DEFAULT ''`,
+    `ALTER TABLE invitations ADD COLUMN IF NOT EXISTS class_code TEXT NOT NULL DEFAULT ''`,
+    `ALTER TABLE invitations ADD COLUMN IF NOT EXISTS cohort_years TEXT NOT NULL DEFAULT ''`,
+    `ALTER TABLE invitations ADD COLUMN IF NOT EXISTS major TEXT NOT NULL DEFAULT ''`,
+    `ALTER TABLE invitations ADD COLUMN IF NOT EXISTS music_url TEXT NOT NULL DEFAULT ''`,
+  ]
+
+  for (const sql of migrations) {
+    await pool.query(sql)
+  }
+
   console.log('PostgreSQL connected — invitations table ready')
 }

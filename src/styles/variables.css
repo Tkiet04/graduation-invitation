@@ -1,27 +1,28 @@
 :root {
-  --inv-bg: #1a1a1a;
-  --inv-panel: #2a2a2a;
-  --inv-panel-soft: rgba(42, 42, 42, 0.72);
-  --inv-text: #ffffff;
-  --inv-muted: #c8c8c8;
-  --inv-gold: #d4a84b;
-  --inv-name-bg: #f3e7a8;
-  --inv-name-text: #1a1a1a;
-  --inv-glow: rgba(232, 140, 40, 0.45);
-  --inv-pill-dark: #3a3a3a;
+  --inv-bg: #f3f1ee;
+  --inv-panel: #ffffff;
+  --inv-panel-soft: rgba(255, 255, 255, 0.72);
+  --inv-text: #1a1a1a;
+  --inv-muted: #6a6a6a;
+  --inv-gold: #c9a227;
+  --inv-name-bg: #0b1c33;
+  --inv-name-text: #ffffff;
+  --inv-glow: rgba(11, 28, 51, 0.18);
+  --inv-pill-dark: #0b1c33;
   --inv-width: 420px;
 
   --font-script: 'Great Vibes', cursive;
-  --font-display: 'Montserrat', system-ui, sans-serif;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-display: 'Cinzel', 'Times New Roman', serif;
   --font-body: 'Montserrat', system-ui, sans-serif;
 
-  --color-bg: #0f0f0f;
-  --color-surface: #1c1c1c;
+  --color-bg: #101418;
+  --color-surface: #1a2028;
   --color-text: #f5f5f5;
-  --color-text-muted: #9a9a9a;
-  --color-primary: #e8a838;
-  --color-primary-dark: #c48420;
-  --color-border: #333;
+  --color-text-muted: #9aa3ad;
+  --color-primary: #c9a227;
+  --color-primary-dark: #a8841a;
+  --color-border: #2c3540;
   --color-danger: #e05a5a;
   --radius: 12px;
   --space-xs: 0.5rem;

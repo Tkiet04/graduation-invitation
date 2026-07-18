@@ -3,10 +3,17 @@ export interface InvitationFormValues {
   recipientName: string
   date: string
   time: string
+  timeEnd: string
   locationText: string
   locationAddress: string
   locationMap: string
   contactInfo: string
+  message: string
+  schoolCode: string
+  classCode: string
+  cohortYears: string
+  major: string
+  musicUrl: string
   backgroundImg: string
   mainImg: string
 }

@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { InvitationCard } from '@/components/invitation/InvitationCard'
+import { EnvelopeIntro } from '@/components/invitation/EnvelopeIntro'
 import { QrShareBox } from '@/components/form/QrShareBox'
 import { getInvitation } from '@/services/invitationApi'
 import type { InvitationRecord } from '@/types/invitation'
@@ -11,10 +12,13 @@ export function InvitationViewPage() {
   const [searchParams] = useSearchParams()
   const showQr =
     searchParams.get('created') === '1' || searchParams.get('share') === '1'
+  /** Chỉ tắt khi ?envelope=0 */
+  const skipEnvelope = searchParams.get('envelope') === '0'
 
   const [invitation, setInvitation] = useState<InvitationRecord | null>(null)
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
+  const [showEnvelope, setShowEnvelope] = useState(!skipEnvelope)
 
   useEffect(() => {
     if (!id) {
@@ -26,6 +30,7 @@ export function InvitationViewPage() {
     let cancelled = false
     setLoading(true)
     setNotFound(false)
+    setShowEnvelope(!skipEnvelope)
 
     getInvitation(id)
       .then((data) => {
@@ -33,9 +38,9 @@ export function InvitationViewPage() {
         if (!data) {
           setNotFound(true)
           setInvitation(null)
-        } else {
-          setInvitation(data)
+          return
         }
+        setInvitation(data)
       })
       .catch(() => {
         if (!cancelled) setNotFound(true)
@@ -47,7 +52,11 @@ export function InvitationViewPage() {
     return () => {
       cancelled = true
     }
-  }, [id])
+  }, [id, skipEnvelope])
+
+  const handleEnvelopeOpened = useCallback(() => {
+    setShowEnvelope(false)
+  }, [])
 
   if (loading) {
     return <p className="empty-state">Đang tải thư mời...</p>
@@ -69,14 +78,19 @@ export function InvitationViewPage() {
 
   return (
     <div className="view-page">
-      <InvitationCard data={invitation} />
-
-      {showQr && (
+      {showEnvelope ? (
+        <EnvelopeIntro data={invitation} onOpened={handleEnvelopeOpened} />
+      ) : (
         <>
-          <QrShareBox invitation={invitation} />
-          <Link className="btn btn--ghost" to="/">
-            ← Tạo thư mời khác
-          </Link>
+          <InvitationCard data={invitation} />
+          {showQr && (
+            <>
+              <QrShareBox invitation={invitation} />
+              <Link className="btn btn--ghost" to="/">
+                ← Tạo thư mời khác
+              </Link>
+            </>
+          )}
         </>
       )}
     </div>

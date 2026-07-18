@@ -50,13 +50,15 @@ router.post('/', async (req, res) => {
     await pool.query(
       `
       INSERT INTO invitations (
-        id, graduate_name, recipient_name, date, time,
+        id, graduate_name, recipient_name, date, time, time_end,
         location_text, location_address, location_map, contact_info,
+        message, school_code, class_code, cohort_years, major, music_url,
         background_img, main_img, created_at
       ) VALUES (
-        $1, $2, $3, $4, $5,
-        $6, $7, $8, $9,
-        $10, $11, $12
+        $1, $2, $3, $4, $5, $6,
+        $7, $8, $9, $10,
+        $11, $12, $13, $14, $15, $16,
+        $17, $18, $19
       )
       `,
       [
@@ -65,10 +67,17 @@ router.post('/', async (req, res) => {
         body.recipientName?.trim() ?? '',
         body.date ?? '',
         body.time ?? '',
+        body.timeEnd?.trim() ?? '',
         body.locationText?.trim() ?? '',
         body.locationAddress?.trim() ?? '',
         body.locationMap?.trim() ?? '',
         body.contactInfo?.trim() ?? '',
+        body.message?.trim() ?? '',
+        body.schoolCode?.trim() ?? '',
+        body.classCode?.trim() ?? '',
+        body.cohortYears?.trim() ?? '',
+        body.major?.trim() ?? '',
+        body.musicUrl?.trim() ?? '',
         backgroundImg,
         mainImg,
         createdAt,

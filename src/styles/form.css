@@ -18,9 +18,10 @@
   }
 
   .form-page__preview .inv-card {
-    transform: scale(0.72);
+    transform: scale(0.68);
     transform-origin: top center;
-    margin-bottom: -18%;
+    margin-bottom: -22%;
+    max-height: 70svh;
   }
 }
 
@@ -137,6 +138,23 @@
   flex-wrap: wrap;
 }
 
+.audio-upload__status {
+  font-size: 0.82rem;
+  color: var(--color-text);
+  margin-bottom: 0.5rem;
+  word-break: break-all;
+}
+
+.audio-upload__status--empty {
+  color: var(--color-text-muted);
+}
+
+.audio-upload__hint {
+  margin-top: 0.45rem;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
 .image-upload input[type='file'] {
   display: none;
 }
@@ -184,6 +202,24 @@
   display: grid;
   justify-items: center;
   gap: var(--space-lg);
+}
+
+@media (max-width: 480px) {
+  .view-page {
+    gap: 0;
+  }
+
+  .view-page .inv-card,
+  .view-page .env-scene {
+    border-radius: 0;
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .layout__main:has(.view-page) {
+    padding: 0;
+    max-width: none;
+  }
 }
 
 .share-box {

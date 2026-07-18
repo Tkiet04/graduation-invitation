@@ -28,7 +28,7 @@ export function QrShareBox({ invitation }: QrShareBoxProps) {
     <div className="share-box">
       <h3 className="share-box__title">Mã QR — gửi cho {invitation.recipientName}</h3>
       <p className="share-box__desc">
-        Quét QR bất kỳ lúc nào để xem thư mời — dữ liệu lưu trên server.
+        Quét QR để mở bìa thư → mở thư → xem thiệp đầy đủ.
       </p>
 
       <div className="share-box__qr">
