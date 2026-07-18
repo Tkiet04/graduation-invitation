@@ -77,7 +77,7 @@
   top: 0;
   width: clamp(46px, 13.2%, 54px);
   min-height: 292px;
-  background: linear-gradient(180deg, #0c1a32 0%, #07101f 55%, #050c16 100%);
+  background: linear-gradient(180deg, #1a3a5c 0%, #122c48 50%, #0d223a 100%);
   border: 2px solid var(--gold);
   border-top: none;
   box-shadow:

@@ -10,9 +10,9 @@ import '@/styles/form.css'
 export function InvitationViewPage() {
   const { id } = useParams<{ id: string }>()
   const [searchParams] = useSearchParams()
-  const showQr =
+  /** Chỉ người tạo thiệp mới thấy QR / nút tạo lại */
+  const isCreator =
     searchParams.get('created') === '1' || searchParams.get('share') === '1'
-  /** Chỉ tắt khi ?envelope=0 */
   const skipEnvelope = searchParams.get('envelope') === '0'
 
   const [invitation, setInvitation] = useState<InvitationRecord | null>(null)
@@ -69,9 +69,11 @@ export function InvitationViewPage() {
         <p style={{ margin: '0.75rem 0 1.25rem' }}>
           Link có thể sai hoặc thư mời đã bị xóa.
         </p>
-        <Link className="btn btn--primary" to="/">
-          Tạo thư mời mới
-        </Link>
+        {isCreator && (
+          <Link className="btn btn--primary" to="/">
+            Tạo thư mời mới
+          </Link>
+        )}
       </div>
     )
   }
@@ -83,7 +85,7 @@ export function InvitationViewPage() {
       ) : (
         <>
           <InvitationCard data={invitation} />
-          {showQr && (
+          {isCreator && (
             <>
               <QrShareBox invitation={invitation} />
               <Link className="btn btn--ghost" to="/">
