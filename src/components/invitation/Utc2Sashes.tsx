@@ -65,11 +65,12 @@ export function Utc2Sashes({
       <aside className="inv-sash inv-sash--left">
         <div className="inv-sash__inner">
           <UtcEmblem className="inv-sash__emblem" />
-          <p className="inv-sash__label">KHÓA</p>
           <p className="inv-sash__kode">{klass}</p>
-          <p className="inv-sash__line">LỄ TỐT NGHIỆP</p>
-          <p className="inv-sash__major">{majorLabel}</p>
-          <p className="inv-sash__years">NIÊN KHÓA {years}</p>
+          <div className="inv-sash__meta">
+            <p className="inv-sash__line">LỄ TỐT NGHIỆP</p>
+            <p className="inv-sash__major">{majorLabel}</p>
+            <p className="inv-sash__years">NIÊN KHÓA {years}</p>
+          </div>
           <UtcEmblem className="inv-sash__emblem inv-sash__emblem--bottom" />
         </div>
         <span className="inv-sash__tassel" />
@@ -81,9 +82,8 @@ export function Utc2Sashes({
           <p className="inv-sash__utc">{code}</p>
           <div className="inv-sash__vertical">
             <span>TRƯỜNG ĐẠI HỌC GIAO THÔNG VẬN TẢI</span>
-            <span className="inv-sash__vertical-sub">
-              PHÂN HIỆU TẠI THÀNH PHỐ HỒ CHÍ MINH
-            </span>
+            <span className="inv-sash__vertical-sub">PHÂN HIỆU TẠI THÀNH PHỐ</span>
+            <span className="inv-sash__vertical-sub">HỒ CHÍ MINH</span>
           </div>
           <p className="inv-sash__city">
             HOCHIMINH

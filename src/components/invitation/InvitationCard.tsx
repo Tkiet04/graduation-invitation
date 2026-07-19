@@ -8,12 +8,7 @@ import {
   getYear,
 } from '@/utils/dateFormat'
 import { Utc2Sashes } from '@/components/invitation/Utc2Sashes'
-import {
-  getInvitationAudio,
-  isInvitationMusicPlaying,
-  pauseInvitationMusic,
-  playInvitationMusic,
-} from '@/utils/musicPlayer'
+import { getInvitationAudio, playInvitationMusic } from '@/utils/musicPlayer'
 
 const UTC_LOGO = '/decorations/utc-logo.png'
 import '@/styles/invitation.css'
@@ -30,6 +25,22 @@ function PinIcon() {
   )
 }
 
+function PhoneIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.2 1.2.4 2.5.6 3.8.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.6.6 3.8.1.4 0 .8-.3 1.1L6.6 10.8z" />
+    </svg>
+  )
+}
+
+function FacebookIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M14 9h3V6h-3c-1.7 0-3 1.3-3 3v2H9v3h2v7h3v-7h2.6l.4-3H14V9z" />
+    </svg>
+  )
+}
+
 function GradCapIcon() {
   return (
     <svg className="inv-card__cap" viewBox="0 0 64 40" aria-hidden="true">
@@ -42,44 +53,14 @@ function GradCapIcon() {
   )
 }
 
-function MusicIcon({ muted }: { muted: boolean }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M9 18V6l10-2v12"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <circle cx="7" cy="18" r="2.5" stroke="currentColor" strokeWidth="1.8" />
-      <circle cx="17" cy="16" r="2.5" stroke="currentColor" strokeWidth="1.8" />
-      {muted && (
-        <path d="M3 3l18 18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-      )}
-    </svg>
-  )
-}
-
-function ChevronIcon({ up }: { up?: boolean }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d={up ? 'M6 14l6-6 6 6' : 'M6 10l6 6 6-6'}
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
 export function InvitationCard({ data }: InvitationCardProps) {
   const nameLabel = data.graduateName.trim() || 'Nguyễn Tuấn Kiệt'
   const schoolLabel =
-    data.locationText.trim() ||
-    'TRƯỜNG ĐẠI HỌC GIAO THÔNG VẬN TẢI - PHÂN HIỆU TẠI TP.HCM'
+    (data.locationText.trim() ||
+      'TRƯỜNG ĐẠI HỌC GIAO THÔNG VẬN TẢI PHÂN HIỆU TẠI TP.HCM').replace(
+        /\s*[-–—]\s*/g,
+        ' ',
+      )
   const mapAddressLabel =
     data.locationAddress.trim() ||
     '450-451 Lê Văn Việt, P. Tăng Nhơn Phú A, TP. Thủ Đức, TP.HCM'
@@ -100,10 +81,20 @@ export function InvitationCard({ data }: InvitationCardProps) {
     (data.locationAddress
       ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(data.locationAddress)}`
       : undefined)
+  const contactLabel = data.contactInfo.trim() || '0901 234 567'
+  const contactTel = contactLabel.replace(/[^\d+]/g, '')
+  const facebookRaw = data.facebookInfo.trim() || 'facebook.com/tuankiet'
+  const facebookHref = /^https?:\/\//i.test(facebookRaw)
+    ? facebookRaw
+    : facebookRaw.includes('facebook.com')
+      ? `https://${facebookRaw.replace(/^\/+/, '')}`
+      : `https://www.facebook.com/${facebookRaw.replace(/^@/, '')}`
+  const facebookDisplay = facebookRaw
+    .replace(/^https?:\/\//i, '')
+    .replace(/^www\./i, '')
+    .replace(/^facebook\.com\//i, '')
 
   const scrollRef = useRef<HTMLElement>(null)
-  const [muted, setMuted] = useState(!isInvitationMusicPlaying())
-  const [atBottom, setAtBottom] = useState(false)
   const [entered, setEntered] = useState(false)
 
   useEffect(() => {
@@ -112,9 +103,10 @@ export function InvitationCard({ data }: InvitationCardProps) {
   }, [])
 
   useEffect(() => {
-    // Đồng bộ icon loa với trạng thái nhạc (đã phát từ bìa thư)
-    setMuted(!isInvitationMusicPlaying())
+    // Chỉ phát khi có nhạc do người dùng chọn
+    if (!data.musicUrl.trim()) return
     getInvitationAudio(data.musicUrl)
+    void playInvitationMusic(data.musicUrl)
   }, [data.musicUrl])
 
   useEffect(() => {
@@ -137,41 +129,6 @@ export function InvitationCard({ data }: InvitationCardProps) {
     }
   }, [entered])
 
-  useEffect(() => {
-    const el = scrollRef.current
-    if (!el) return
-
-    function onScroll() {
-      if (!el) return
-      const nearBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 24
-      setAtBottom(nearBottom)
-    }
-
-    onScroll()
-    el.addEventListener('scroll', onScroll, { passive: true })
-    return () => el.removeEventListener('scroll', onScroll)
-  }, [])
-
-  async function toggleMusic() {
-    if (muted || !isInvitationMusicPlaying()) {
-      const ok = await playInvitationMusic(data.musicUrl)
-      setMuted(!ok)
-    } else {
-      pauseInvitationMusic()
-      setMuted(true)
-    }
-  }
-
-  function scrollInvite() {
-    const el = scrollRef.current
-    if (!el) return
-    if (atBottom) {
-      el.scrollTo({ top: 0, behavior: 'smooth' })
-    } else {
-      el.scrollBy({ top: el.clientHeight * 0.55, behavior: 'smooth' })
-    }
-  }
-
   const bgStyle = data.backgroundImg
     ? { backgroundImage: `url(${data.backgroundImg})` }
     : undefined
@@ -185,6 +142,42 @@ export function InvitationCard({ data }: InvitationCardProps) {
       <div className="inv-card__silk" style={bgStyle} aria-hidden="true" />
       <div className="inv-card__shimmer" aria-hidden="true" />
 
+      <img
+        className="inv-card__chibi"
+        src="/decorations/grad-chibi.png"
+        alt=""
+        draggable={false}
+        aria-hidden="true"
+      />
+
+      <div className="inv-card__corner-contact">
+        {contactTel.length >= 8 ? (
+          <a
+            className="inv-card__corner-contact-item inv-card__corner-contact-item--phone"
+            href={`tel:${contactTel}`}
+            aria-label={`Gọi ${contactLabel}`}
+          >
+            <PhoneIcon />
+            <span>{contactLabel}</span>
+          </a>
+        ) : (
+          <span className="inv-card__corner-contact-item inv-card__corner-contact-item--phone">
+            <PhoneIcon />
+            <span>{contactLabel}</span>
+          </span>
+        )}
+        <a
+          className="inv-card__corner-contact-item inv-card__corner-contact-item--fb"
+          href={facebookHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`Facebook ${facebookDisplay}`}
+        >
+          <FacebookIcon />
+          <span>{facebookDisplay}</span>
+        </a>
+      </div>
+
       <div className="inv-card__content">
         <Utc2Sashes
           schoolCode={schoolCode}
@@ -195,29 +188,28 @@ export function InvitationCard({ data }: InvitationCardProps) {
 
         {data.recipientName.trim() && (
           <p
-            className="inv-card__recipient inv-card__anim"
-            style={{ '--d': '0.05s' } as CSSProperties}
+            className="inv-card__recipient inv-card__anim inv-card__anim--from-top"
+            style={{ '--d': '0.08s' } as CSSProperties}
           >
-            Thân gửi <strong>{data.recipientName.trim()}</strong>
+            Dear: <strong>{data.recipientName.trim()}</strong>
           </p>
         )}
 
         <header
-          className="inv-card__brand inv-card__anim"
-          style={{ '--d': '0.12s' } as CSSProperties}
+          className="inv-card__brand inv-card__anim inv-card__anim--from-top"
+          style={{ '--d': '0.2s' } as CSSProperties}
         >
           <img
             className="inv-card__logo-img"
             src={data.mainImg.trim() || UTC_LOGO}
             alt="Logo Trường Đại học Giao thông Vận tải"
           />
-          <p className="inv-card__uni-code">{schoolCode}</p>
           <p className="inv-card__uni-name">{schoolLabel}</p>
         </header>
 
         <div
-          className="inv-card__title-block inv-card__anim"
-          style={{ '--d': '0.22s' } as CSSProperties}
+          className="inv-card__title-block inv-card__anim inv-card__anim--from-left"
+          style={{ '--d': '0.36s' } as CSSProperties}
         >
           <GradCapIcon />
           <p className="inv-card__title-grad">Graduation</p>
@@ -225,26 +217,22 @@ export function InvitationCard({ data }: InvitationCardProps) {
         </div>
 
         <p
-          className="inv-card__name inv-card__anim"
-          style={{ '--d': '0.34s' } as CSSProperties}
+          className="inv-card__name inv-card__anim inv-card__anim--from-right"
+          style={{ '--d': '0.52s' } as CSSProperties}
         >
           {nameLabel}
         </p>
 
-        <p className="inv-card__meta inv-card__anim" style={{ '--d': '0.38s' } as CSSProperties}>
-          {classCode} · {major}
-        </p>
-
         <p
-          className="inv-card__message inv-card__anim"
-          style={{ '--d': '0.44s' } as CSSProperties}
+          className="inv-card__message inv-card__anim inv-card__anim--from-bottom"
+          style={{ '--d': '0.68s' } as CSSProperties}
         >
           {message}
         </p>
 
         <div
-          className="inv-card__datetime inv-card__anim"
-          style={{ '--d': '0.54s' } as CSSProperties}
+          className="inv-card__datetime inv-card__anim inv-card__anim--from-scale"
+          style={{ '--d': '0.84s' } as CSSProperties}
         >
           <div className="inv-card__side">
             <span className="inv-card__rule" />
@@ -266,8 +254,8 @@ export function InvitationCard({ data }: InvitationCardProps) {
         </div>
 
         <div
-          className="inv-card__location inv-card__anim"
-          style={{ '--d': '0.66s' } as CSSProperties}
+          className="inv-card__location inv-card__anim inv-card__anim--from-bottom"
+          style={{ '--d': '1.08s' } as CSSProperties}
         >
           <p className="inv-card__location-label">LOCATION</p>
           {mapHref ? (
@@ -285,8 +273,8 @@ export function InvitationCard({ data }: InvitationCardProps) {
         </div>
 
         <div
-          className="inv-card__actions inv-card__anim"
-          style={{ '--d': '0.78s' } as CSSProperties}
+          className="inv-card__actions inv-card__anim inv-card__anim--from-bottom"
+          style={{ '--d': '1.22s' } as CSSProperties}
         >
           {mapHref ? (
             <a
@@ -304,36 +292,8 @@ export function InvitationCard({ data }: InvitationCardProps) {
               <span>Chỉ đường</span>
             </span>
           )}
-
-          <div className="inv-card__fabs">
-            <button
-              type="button"
-              className="inv-card__fab"
-              onClick={scrollInvite}
-              aria-label={atBottom ? 'Cuộn lên đầu' : 'Cuộn xuống'}
-            >
-              <ChevronIcon up={atBottom} />
-            </button>
-            <button
-              type="button"
-              className="inv-card__fab"
-              onClick={toggleMusic}
-              aria-label={muted ? 'Bật nhạc' : 'Tắt nhạc'}
-              title="Bật / tắt nhạc nền"
-            >
-              <MusicIcon muted={muted} />
-            </button>
-          </div>
         </div>
 
-        {data.contactInfo.trim() && (
-          <p
-            className="inv-card__contact inv-card__anim"
-            style={{ '--d': '0.88s' } as CSSProperties}
-          >
-            {data.contactInfo.trim()}
-          </p>
-        )}
       </div>
     </article>
   )

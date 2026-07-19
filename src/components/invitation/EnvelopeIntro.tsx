@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import type { InvitationFormValues } from '@/types/invitation'
 import { getWeekdayVi, formatTimeRange } from '@/utils/dateFormat'
 import { playInvitationMusic } from '@/utils/musicPlayer'
+import { ConfettiBurst } from '@/components/invitation/ConfettiBurst'
 import '@/styles/envelope.css'
 
 interface EnvelopeIntroProps {
@@ -11,8 +12,29 @@ interface EnvelopeIntroProps {
 
 type Phase = 'closed' | 'opening' | 'rising' | 'exit'
 
+function WaxSeal() {
+  return (
+    <span className="env__wax" aria-hidden="true">
+      <svg className="env__wax-ring" viewBox="0 0 80 80">
+        <defs>
+          <linearGradient id="waxGold" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#f0d878" />
+            <stop offset="45%" stopColor="#d4af37" />
+            <stop offset="100%" stopColor="#9a7410" />
+          </linearGradient>
+        </defs>
+        <circle cx="40" cy="40" r="36" fill="url(#waxGold)" />
+        <circle cx="40" cy="40" r="28" fill="#0a1628" />
+        <circle cx="40" cy="40" r="26" fill="none" stroke="url(#waxGold)" strokeWidth="1.2" />
+      </svg>
+      <span className="env__wax-text">UTC2</span>
+    </span>
+  )
+}
+
 export function EnvelopeIntro({ data, onOpened }: EnvelopeIntroProps) {
   const [phase, setPhase] = useState<Phase>('closed')
+  const [confetti, setConfetti] = useState(false)
   const name = data.graduateName.trim() || 'Nguyễn Tuấn Kiệt'
   const address =
     data.locationAddress.trim() ||
@@ -22,13 +44,13 @@ export function EnvelopeIntro({ data, onOpened }: EnvelopeIntroProps) {
 
   useEffect(() => {
     if (phase !== 'opening') return
-    const t1 = window.setTimeout(() => setPhase('rising'), 900)
+    const t1 = window.setTimeout(() => setPhase('rising'), 950)
     return () => window.clearTimeout(t1)
   }, [phase])
 
   useEffect(() => {
     if (phase !== 'rising') return
-    const t1 = window.setTimeout(() => setPhase('exit'), 1600)
+    const t1 = window.setTimeout(() => setPhase('exit'), 1650)
     return () => window.clearTimeout(t1)
   }, [phase])
 
@@ -41,7 +63,7 @@ export function EnvelopeIntro({ data, onOpened }: EnvelopeIntroProps) {
   async function handleOpen() {
     if (phase !== 'closed') return
     setPhase('opening')
-    // Gesture người dùng → được phép autoplay nhạc
+    setConfetti(true)
     await playInvitationMusic(data.musicUrl)
   }
 
@@ -52,6 +74,7 @@ export function EnvelopeIntro({ data, onOpened }: EnvelopeIntroProps) {
       aria-label="Bìa thư mời lễ tốt nghiệp"
     >
       <div className="env-scene__sky" aria-hidden="true" />
+      <ConfettiBurst active={confetti} />
 
       <header className="env-scene__title">
         <span className="env-scene__cap" aria-hidden="true">
@@ -91,16 +114,19 @@ export function EnvelopeIntro({ data, onOpened }: EnvelopeIntroProps) {
             </p>
           </div>
 
-          <div className="env__pocket" aria-hidden="true" />
-          <div className="env__flap" aria-hidden="true" />
-          <div className="env__front" aria-hidden="true">
-            <span className="env__seal">UTC2</span>
+          <div className="env__shell" aria-hidden="true">
+            <div className="env__panel env__panel--back" />
+            <div className="env__panel env__panel--left" />
+            <div className="env__panel env__panel--right" />
+            <div className="env__panel env__panel--bottom" />
+            <div className="env__flap" />
+            <WaxSeal />
           </div>
         </div>
       </button>
 
       {phase === 'closed' && (
-        <p className="env-scene__hint">Chạm vào bìa thư để mở · nhạc sẽ phát</p>
+        <p className="env-scene__hint">Chạm vào bìa thư để mở</p>
       )}
     </div>
   )

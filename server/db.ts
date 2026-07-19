@@ -38,6 +38,7 @@ export interface InvitationRow {
   location_address: string
   location_map: string
   contact_info: string
+  facebook_info: string
   message: string
   school_code: string
   class_code: string
@@ -60,6 +61,7 @@ export interface InvitationPayload {
   locationAddress: string
   locationMap: string
   contactInfo: string
+  facebookInfo: string
   message: string
   schoolCode: string
   classCode: string
@@ -88,6 +90,7 @@ export function rowToRecord(row: InvitationRow): InvitationPayload {
     locationAddress: row.location_address,
     locationMap: row.location_map,
     contactInfo: row.contact_info,
+    facebookInfo: row.facebook_info ?? '',
     message: row.message ?? '',
     schoolCode: row.school_code ?? '',
     classCode: row.class_code ?? '',
@@ -113,6 +116,7 @@ export async function initDb(): Promise<void> {
       location_address TEXT NOT NULL,
       location_map TEXT NOT NULL DEFAULT '',
       contact_info TEXT NOT NULL DEFAULT '',
+      facebook_info TEXT NOT NULL DEFAULT '',
       message TEXT NOT NULL DEFAULT '',
       school_code TEXT NOT NULL DEFAULT '',
       class_code TEXT NOT NULL DEFAULT '',
@@ -133,6 +137,7 @@ export async function initDb(): Promise<void> {
     `ALTER TABLE invitations ADD COLUMN IF NOT EXISTS cohort_years TEXT NOT NULL DEFAULT ''`,
     `ALTER TABLE invitations ADD COLUMN IF NOT EXISTS major TEXT NOT NULL DEFAULT ''`,
     `ALTER TABLE invitations ADD COLUMN IF NOT EXISTS music_url TEXT NOT NULL DEFAULT ''`,
+    `ALTER TABLE invitations ADD COLUMN IF NOT EXISTS facebook_info TEXT NOT NULL DEFAULT ''`,
   ]
 
   for (const sql of migrations) {

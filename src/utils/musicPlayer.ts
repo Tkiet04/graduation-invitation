@@ -1,13 +1,11 @@
-/** Nhạc nền dùng chung — mở bìa thư / nút loa trên thiệp */
-
-const DEFAULT_MUSIC = '/audio/invitation-bg.wav'
+/** Nhạc nền — chỉ phát khi người dùng tự chọn (upload / link) */
 
 let audio: HTMLAudioElement | null = null
 let currentSrc = ''
 
-function resolveSrc(url?: string): string {
+function resolveSrc(url?: string): string | null {
   const trimmed = url?.trim()
-  if (!trimmed) return DEFAULT_MUSIC
+  if (!trimmed) return null
   if (
     trimmed.startsWith('data:audio') ||
     /^https?:\/\//i.test(trimmed) ||
@@ -15,11 +13,16 @@ function resolveSrc(url?: string): string {
   ) {
     return trimmed
   }
-  return DEFAULT_MUSIC
+  return null
 }
 
-export function getInvitationAudio(url?: string): HTMLAudioElement {
+export function getInvitationAudio(url?: string): HTMLAudioElement | null {
   const src = resolveSrc(url)
+  if (!src) {
+    pauseInvitationMusic()
+    return null
+  }
+
   const absolute = src.startsWith('data:')
     ? src
     : new URL(src, window.location.origin).href
@@ -38,6 +41,7 @@ export function getInvitationAudio(url?: string): HTMLAudioElement {
 
 export async function playInvitationMusic(url?: string): Promise<boolean> {
   const el = getInvitationAudio(url)
+  if (!el) return false
   try {
     await el.play()
     return true
@@ -53,8 +57,4 @@ export function pauseInvitationMusic(): void {
 
 export function isInvitationMusicPlaying(): boolean {
   return !!audio && !audio.paused
-}
-
-export function getDefaultMusicUrl(): string {
-  return DEFAULT_MUSIC
 }

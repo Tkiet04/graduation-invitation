@@ -1,10 +1,13 @@
-/* Envelope intro — guest opens QR invitation */
+/* Envelope intro — phong bì xanh kín + thư trồi ra như cũ */
 
 .env-scene {
   --env-blue: #5b7a9d;
+  --env-blue-mid: #6284a4;
   --env-blue-deep: #3f5a78;
+  --env-blue-dark: #2f4760;
   --env-cream: #f7f3ec;
   --env-ink: #1a1a1a;
+  --env-gold: #d4af37;
   position: relative;
   width: 100%;
   max-width: var(--inv-width, 420px);
@@ -32,11 +35,20 @@
   pointer-events: none;
 }
 
+.env-confetti {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
 .env-scene__title {
   position: relative;
   z-index: 2;
   text-align: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.65rem;
   animation: env-title-in 0.9s ease both;
 }
 
@@ -73,18 +85,23 @@
 .env-wrap {
   position: relative;
   z-index: 2;
-  width: min(300px, 78vw);
+  width: min(320px, 82vw);
   border: none;
   background: none;
   padding: 0;
   cursor: pointer;
-  perspective: 900px;
+  perspective: 1100px;
   -webkit-tap-highlight-color: transparent;
+  transition: transform 0.35s ease;
+}
+
+.env-wrap:hover:not(:disabled) {
+  transform: translateY(-3px);
 }
 
 .env-wrap:focus-visible {
   outline: 2px solid var(--env-blue-deep);
-  outline-offset: 8px;
+  outline-offset: 10px;
   border-radius: 8px;
 }
 
@@ -95,17 +112,19 @@
 .env {
   position: relative;
   width: 100%;
-  aspect-ratio: 1.35 / 1;
+  aspect-ratio: 1.45 / 1;
   transform-style: preserve-3d;
+  filter: drop-shadow(0 18px 32px rgba(30, 50, 70, 0.32));
 }
 
+/* ===== Thiệp bên trong — trồi ra như cũ ===== */
 .env__letter {
   position: absolute;
   left: 8%;
   right: 8%;
-  bottom: 28%;
+  bottom: 22%;
   z-index: 2;
-  height: 72%;
+  height: 76%;
   padding: 0.85rem 0.75rem;
   background: linear-gradient(180deg, #fffef9 0%, var(--env-cream) 100%);
   border: 1px solid rgba(90, 110, 130, 0.2);
@@ -113,22 +132,44 @@
   box-shadow: 0 4px 14px rgba(30, 50, 70, 0.18);
   text-align: left;
   color: var(--env-ink);
-  transform: translateY(42%);
-  transition: transform 1.45s cubic-bezier(0.22, 0.61, 0.36, 1);
+  /* Đóng: nằm trong túi, không hở */
+  transform: translateY(88%);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    transform 1.45s cubic-bezier(0.22, 0.61, 0.36, 1),
+    opacity 0.35s ease,
+    visibility 0s linear 0.35s;
   overflow: hidden;
+  pointer-events: none;
 }
 
-.env-scene--rising .env__letter,
-.env-scene--exit .env__letter {
+.env-scene--opening .env__letter {
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(88%);
+}
+
+.env-scene--rising .env__letter {
+  visibility: visible;
+  opacity: 1;
+  z-index: 10;
   transform: translateY(-58%);
+  transition:
+    transform 1.45s cubic-bezier(0.22, 0.61, 0.36, 1),
+    opacity 0.4s ease 0.12s,
+    visibility 0s linear 0s;
 }
 
 .env-scene--exit .env__letter {
+  visibility: visible;
+  opacity: 0;
+  z-index: 10;
+  transform: translateY(-120%) scale(1.08);
   transition:
     transform 0.65s cubic-bezier(0.22, 0.61, 0.36, 1),
-    opacity 0.55s ease;
-  opacity: 0;
-  transform: translateY(-120%) scale(1.08);
+    opacity 0.55s ease,
+    visibility 0s linear 0s;
 }
 
 .env__letter-from {
@@ -177,77 +218,114 @@
   overflow: hidden;
 }
 
-.env__pocket {
+/* ===== Vỏ phong bì xanh kín ===== */
+.env__shell {
   position: absolute;
-  inset: 18% 0 0;
-  z-index: 1;
-  background: linear-gradient(180deg, #6a89a8 0%, var(--env-blue) 40%, var(--env-blue-deep) 100%);
-  border-radius: 0 0 10px 10px;
-  box-shadow: inset 0 8px 16px rgba(0, 0, 0, 0.12);
+  inset: 0;
+  z-index: 4;
+  border-radius: 6px;
+  overflow: visible;
+  transform-style: preserve-3d;
 }
 
+.env__panel {
+  position: absolute;
+  inset: 0;
+}
+
+.env__panel--back {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.12), transparent 45%),
+    linear-gradient(180deg, #6a89a8 0%, var(--env-blue) 45%, var(--env-blue-deep) 100%);
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.env__panel--left {
+  clip-path: polygon(0 0, 50% 50%, 0 100%);
+  background: linear-gradient(115deg, #7a99b6 0%, var(--env-blue-deep) 100%);
+  opacity: 0.92;
+}
+
+.env__panel--right {
+  clip-path: polygon(100% 0, 50% 50%, 100% 100%);
+  background: linear-gradient(245deg, #7a99b6 0%, var(--env-blue-dark) 100%);
+  opacity: 0.92;
+}
+
+.env__panel--bottom {
+  clip-path: polygon(0 100%, 50% 50%, 100% 100%);
+  background: linear-gradient(180deg, var(--env-blue) 0%, var(--env-blue-dark) 100%);
+  opacity: 0.97;
+}
+
+/* Nắp trên xanh — úp kín xuống giữa */
 .env__flap {
   position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  z-index: 4;
-  height: 48%;
-  background: linear-gradient(180deg, #7a99b6 0%, var(--env-blue) 100%);
-  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  inset: 0;
+  z-index: 5;
+  background: linear-gradient(180deg, #7a99b6 0%, var(--env-blue) 50%, var(--env-blue-deep) 100%);
+  clip-path: polygon(0 0, 100% 0, 50% 58%);
   transform-origin: top center;
   transform: rotateX(0deg);
   transform-style: preserve-3d;
-  transition: transform 0.95s cubic-bezier(0.4, 0.05, 0.2, 1);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 1s cubic-bezier(0.4, 0.05, 0.2, 1);
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.22);
   backface-visibility: hidden;
 }
 
 .env-scene--opening .env__flap,
 .env-scene--rising .env__flap,
 .env-scene--exit .env__flap {
-  transform: rotateX(178deg);
+  transform: rotateX(175deg);
 }
 
-.env__front {
+/* ===== Dấu sáp vàng UTC2 ===== */
+.env__wax {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 3;
-  height: 58%;
-  background:
-    linear-gradient(160deg, transparent 42%, rgba(255, 255, 255, 0.08) 43%, transparent 55%),
-    linear-gradient(200deg, transparent 42%, rgba(255, 255, 255, 0.08) 43%, transparent 55%),
-    linear-gradient(180deg, #6284a4 0%, var(--env-blue-deep) 100%);
-  clip-path: polygon(0 28%, 50% 0, 100% 28%, 100% 100%, 0 100%);
-  border-radius: 0 0 10px 10px;
-  box-shadow: 0 14px 28px rgba(30, 50, 70, 0.28);
+  left: 50%;
+  top: 52%;
+  z-index: 6;
+  width: 64px;
+  height: 64px;
+  transform: translate(-50%, -50%);
   display: grid;
   place-items: center;
-  padding-top: 12%;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.35));
+  transition:
+    opacity 0.55s ease,
+    transform 0.55s cubic-bezier(0.4, 0.05, 0.2, 1);
 }
 
-.env__seal {
+.env__wax-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.env__wax-text {
+  position: relative;
+  z-index: 1;
   font-family: var(--font-body);
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 800;
-  letter-spacing: 0.2em;
-  color: rgba(255, 245, 210, 0.92);
-  border: 1.5px solid rgba(212, 175, 55, 0.75);
-  border-radius: 50%;
-  width: 52px;
-  height: 52px;
-  display: grid;
-  place-items: center;
-  background: rgba(10, 22, 40, 0.25);
-  box-shadow: 0 0 0 3px rgba(10, 22, 40, 0.12);
+  letter-spacing: 0.12em;
+  color: var(--env-gold);
+}
+
+.env-scene--opening .env__wax,
+.env-scene--rising .env__wax,
+.env-scene--exit .env__wax {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.7);
+  pointer-events: none;
 }
 
 .env-scene__hint {
   position: relative;
   z-index: 2;
-  margin-top: 1.35rem;
+  margin-top: 1.5rem;
   font-family: var(--font-body);
   font-size: 0.82rem;
   letter-spacing: 0.06em;
@@ -264,6 +342,7 @@
     opacity: 0;
     transform: translateY(-12px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -271,10 +350,12 @@
 }
 
 @keyframes env-hint-pulse {
+
   0%,
   100% {
     opacity: 0.55;
   }
+
   50% {
     opacity: 1;
   }
@@ -292,5 +373,10 @@
     max-width: 100%;
     min-height: 100svh;
     border-radius: 0;
+  }
+
+  .env__wax {
+    width: 58px;
+    height: 58px;
   }
 }

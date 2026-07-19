@@ -84,7 +84,7 @@ export function AudioUploadField({
           <p className="audio-upload__status">{musicLabel(value)}</p>
         ) : (
           <p className="audio-upload__status audio-upload__status--empty">
-            Chưa chọn — sẽ dùng nhạc mặc định
+            Chưa chọn — thiệp sẽ không có nhạc nền
           </p>
         )}
 

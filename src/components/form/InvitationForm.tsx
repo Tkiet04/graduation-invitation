@@ -178,7 +178,7 @@ export function InvitationForm({
             id="locationText"
             value={values.locationText}
             onChange={(e) => update('locationText', e.target.value)}
-            placeholder="TRƯỜNG ĐẠI HỌC GIAO THÔNG VẬN TẢI - PHÂN HIỆU TẠI TP.HCM"
+            placeholder="TRƯỜNG ĐẠI HỌC GIAO THÔNG VẬN TẢI PHÂN HIỆU TẠI TP.HCM"
             required
           />
         </div>
@@ -209,16 +209,26 @@ export function InvitationForm({
           label="Nhạc nền của bạn"
           value={values.musicUrl}
           onChange={(v) => update('musicUrl', v)}
-          hint="Upload mp3/wav (tối đa 5MB) hoặc dán link — để trống = nhạc mặc định"
+          hint="Upload mp3/wav (tối đa 5MB) hoặc dán link — để trống = không có nhạc nền"
         />
 
         <div className="form-field form-field--full">
-          <label htmlFor="contactInfo">Thông tin liên lạc</label>
+          <label htmlFor="contactInfo">Số điện thoại</label>
           <input
             id="contactInfo"
             value={values.contactInfo}
             onChange={(e) => update('contactInfo', e.target.value)}
-            placeholder="0901 234 567 · facebook.com/..."
+            placeholder="0901 234 567"
+          />
+        </div>
+
+        <div className="form-field form-field--full">
+          <label htmlFor="facebookInfo">Facebook</label>
+          <input
+            id="facebookInfo"
+            value={values.facebookInfo}
+            onChange={(e) => update('facebookInfo', e.target.value)}
+            placeholder="facebook.com/tenban hoặc link"
           />
         </div>
 

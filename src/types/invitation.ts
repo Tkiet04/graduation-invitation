@@ -8,6 +8,7 @@ export interface InvitationFormValues {
   locationAddress: string
   locationMap: string
   contactInfo: string
+  facebookInfo: string
   message: string
   schoolCode: string
   classCode: string

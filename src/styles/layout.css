@@ -7,6 +7,9 @@
 .layout--guest .layout__main {
   padding: 0;
   max-width: none;
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
 }
 
 .layout__header {

@@ -51,14 +51,14 @@ router.post('/', async (req, res) => {
       `
       INSERT INTO invitations (
         id, graduate_name, recipient_name, date, time, time_end,
-        location_text, location_address, location_map, contact_info,
+        location_text, location_address, location_map, contact_info, facebook_info,
         message, school_code, class_code, cohort_years, major, music_url,
         background_img, main_img, created_at
       ) VALUES (
         $1, $2, $3, $4, $5, $6,
-        $7, $8, $9, $10,
-        $11, $12, $13, $14, $15, $16,
-        $17, $18, $19
+        $7, $8, $9, $10, $11,
+        $12, $13, $14, $15, $16, $17,
+        $18, $19, $20
       )
       `,
       [
@@ -72,6 +72,7 @@ router.post('/', async (req, res) => {
         body.locationAddress?.trim() ?? '',
         body.locationMap?.trim() ?? '',
         body.contactInfo?.trim() ?? '',
+        body.facebookInfo?.trim() ?? '',
         body.message?.trim() ?? '',
         body.schoolCode?.trim() ?? '',
         body.classCode?.trim() ?? '',
