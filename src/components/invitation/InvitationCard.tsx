@@ -8,10 +8,17 @@ import {
   getYear,
 } from '@/utils/dateFormat'
 import { Utc2Sashes } from '@/components/invitation/Utc2Sashes'
+import {
+  TypewriterText,
+  typewriterDuration,
+} from '@/components/invitation/TypewriterText'
 import { getInvitationAudio, playInvitationMusic } from '@/utils/musicPlayer'
 
 const UTC_LOGO = '/decorations/utc-logo.png'
 import '@/styles/invitation.css'
+
+const CHAR_MS = 26
+const TYPE_START = 420
 
 interface InvitationCardProps {
   data: InvitationFormValues
@@ -58,9 +65,9 @@ export function InvitationCard({ data }: InvitationCardProps) {
   const schoolLabel =
     (data.locationText.trim() ||
       'TRƯỜNG ĐẠI HỌC GIAO THÔNG VẬN TẢI PHÂN HIỆU TẠI TP.HCM').replace(
-        /\s*[-–—]\s*/g,
-        ' ',
-      )
+      /\s*[-–—]\s*/g,
+      ' ',
+    )
   const mapAddressLabel =
     data.locationAddress.trim() ||
     '450-451 Lê Văn Việt, P. Tăng Nhơn Phú A, TP. Thủ Đức, TP.HCM'
@@ -94,6 +101,46 @@ export function InvitationCard({ data }: InvitationCardProps) {
     .replace(/^www\./i, '')
     .replace(/^facebook\.com\//i, '')
 
+  const recipientName = data.recipientName.trim()
+  const dearPrefix = 'Dear: '
+
+  // Sequential typewriter timeline (ms)
+  let cursor = TYPE_START
+  const dDear = cursor
+  const dRecipientName = recipientName
+    ? typewriterDuration(dearPrefix, cursor, CHAR_MS)
+    : cursor
+  if (recipientName) {
+    cursor = typewriterDuration(recipientName, dRecipientName, CHAR_MS) + 120
+  }
+  const dSchool = cursor
+  cursor = typewriterDuration(schoolLabel, cursor, CHAR_MS) + 160
+  const dGrad = cursor
+  cursor = typewriterDuration('Graduation', cursor, CHAR_MS) + 80
+  const dCer = cursor
+  cursor = typewriterDuration('Ceremony', cursor, CHAR_MS) + 120
+  const dName = cursor
+  cursor = typewriterDuration(nameLabel, cursor, CHAR_MS) + 140
+  const dMessage = cursor
+  cursor = typewriterDuration(message, cursor, CHAR_MS) + 160
+  const dWeekday = cursor
+  const dMonth = cursor + 40
+  const dDay = cursor + 80
+  const dYear = cursor + 140
+  const dTime = cursor + 40
+  cursor =
+    Math.max(
+      typewriterDuration(weekday, dWeekday, CHAR_MS),
+      typewriterDuration(month, dMonth, CHAR_MS),
+      typewriterDuration(day, dDay, CHAR_MS),
+      typewriterDuration(year, dYear, CHAR_MS),
+      typewriterDuration(timeRange, dTime, CHAR_MS),
+    ) + 160
+  const dLocLabel = cursor
+  cursor = typewriterDuration('LOCATION', cursor, CHAR_MS) + 80
+  const dAddress = cursor
+  const typeDoneAt = typewriterDuration(mapAddressLabel, cursor, CHAR_MS)
+
   const scrollRef = useRef<HTMLElement>(null)
   const [entered, setEntered] = useState(false)
 
@@ -114,20 +161,23 @@ export function InvitationCard({ data }: InvitationCardProps) {
     const el = scrollRef.current
     if (!el) return
 
+    const mid = Math.max(2200, Math.floor(typeDoneAt * 0.55))
+    const back = Math.max(mid + 1800, typeDoneAt + 400)
+
     const t1 = window.setTimeout(() => {
       const max = Math.max(0, el.scrollHeight - el.clientHeight)
       if (max < 40) return
       el.scrollTo({ top: Math.min(max, el.clientHeight * 0.42), behavior: 'smooth' })
-    }, 1600)
+    }, mid)
     const t2 = window.setTimeout(() => {
       el.scrollTo({ top: 0, behavior: 'smooth' })
-    }, 4200)
+    }, back)
 
     return () => {
       window.clearTimeout(t1)
       window.clearTimeout(t2)
     }
-  }, [entered])
+  }, [entered, typeDoneAt])
 
   const bgStyle = data.backgroundImg
     ? { backgroundImage: `url(${data.backgroundImg})` }
@@ -186,78 +236,146 @@ export function InvitationCard({ data }: InvitationCardProps) {
           cohortYears={cohortYears}
         />
 
-        {data.recipientName.trim() && (
-          <p
-            className="inv-card__recipient inv-card__anim inv-card__anim--from-top"
-            style={{ '--d': '0.08s' } as CSSProperties}
-          >
-            Dear: <strong>{data.recipientName.trim()}</strong>
+        {recipientName && (
+          <p className="inv-card__recipient">
+            <TypewriterText
+              text={dearPrefix}
+              active={entered}
+              startDelay={dDear}
+              charDelay={CHAR_MS}
+            />
+            <TypewriterText
+              as="strong"
+              text={recipientName}
+              active={entered}
+              startDelay={dRecipientName}
+              charDelay={CHAR_MS}
+            />
           </p>
         )}
 
-        <header
-          className="inv-card__brand inv-card__anim inv-card__anim--from-top"
-          style={{ '--d': '0.2s' } as CSSProperties}
-        >
+        <header className="inv-card__brand">
           <img
-            className="inv-card__logo-img"
+            className="inv-card__logo-img inv-card__anim inv-card__anim--from-top"
+            style={{ '--d': '0.15s' } as CSSProperties}
             src={data.mainImg.trim() || UTC_LOGO}
             alt="Logo Trường Đại học Giao thông Vận tải"
           />
-          <p className="inv-card__uni-name">{schoolLabel}</p>
+          <TypewriterText
+            as="p"
+            className="inv-card__uni-name"
+            text={schoolLabel}
+            active={entered}
+            startDelay={dSchool}
+            charDelay={CHAR_MS}
+          />
         </header>
 
-        <div
-          className="inv-card__title-block inv-card__anim inv-card__anim--from-left"
-          style={{ '--d': '0.36s' } as CSSProperties}
-        >
-          <GradCapIcon />
-          <p className="inv-card__title-grad">Graduation</p>
-          <h1 className="inv-card__title-cer">Ceremony</h1>
+        <div className="inv-card__title-block">
+          <TypewriterText
+            as="p"
+            className="inv-card__title-grad"
+            text="Graduation"
+            active={entered}
+            startDelay={dGrad}
+            charDelay={CHAR_MS}
+            decorateChar={{
+              index: 7, // letter "i"
+              node: <GradCapIcon />,
+            }}
+          />
+          <TypewriterText
+            as="h1"
+            className="inv-card__title-cer"
+            text="Ceremony"
+            active={entered}
+            startDelay={dCer}
+            charDelay={CHAR_MS}
+          />
         </div>
 
-        <p
-          className="inv-card__name inv-card__anim inv-card__anim--from-right"
-          style={{ '--d': '0.52s' } as CSSProperties}
-        >
-          {nameLabel}
-        </p>
+        <TypewriterText
+          as="p"
+          className="inv-card__name"
+          text={nameLabel}
+          active={entered}
+          startDelay={dName}
+          charDelay={CHAR_MS}
+        />
 
-        <p
-          className="inv-card__message inv-card__anim inv-card__anim--from-bottom"
-          style={{ '--d': '0.68s' } as CSSProperties}
-        >
-          {message}
-        </p>
+        <TypewriterText
+          as="p"
+          className="inv-card__message"
+          text={message}
+          active={entered}
+          startDelay={dMessage}
+          charDelay={CHAR_MS}
+        />
 
-        <div
-          className="inv-card__datetime inv-card__anim inv-card__anim--from-scale"
-          style={{ '--d': '0.84s' } as CSSProperties}
-        >
+        <div className="inv-card__datetime">
           <div className="inv-card__side">
             <span className="inv-card__rule" />
-            <span className="inv-card__weekday">{weekday}</span>
+            <TypewriterText
+              as="span"
+              className="inv-card__weekday"
+              text={weekday}
+              active={entered}
+              startDelay={dWeekday}
+              charDelay={CHAR_MS}
+            />
             <span className="inv-card__rule" />
           </div>
 
           <div className="inv-card__date-core">
-            <span className="inv-card__month">{month}</span>
-            <span className="inv-card__day">{day}</span>
-            <span className="inv-card__year">{year}</span>
+            <TypewriterText
+              as="span"
+              className="inv-card__month"
+              text={month}
+              active={entered}
+              startDelay={dMonth}
+              charDelay={CHAR_MS}
+            />
+            <TypewriterText
+              as="span"
+              className="inv-card__day"
+              text={day}
+              active={entered}
+              startDelay={dDay}
+              charDelay={CHAR_MS}
+            />
+            <TypewriterText
+              as="span"
+              className="inv-card__year"
+              text={year}
+              active={entered}
+              startDelay={dYear}
+              charDelay={CHAR_MS}
+            />
           </div>
 
           <div className="inv-card__side">
             <span className="inv-card__rule" />
-            <span className="inv-card__time">{timeRange}</span>
+            <TypewriterText
+              as="span"
+              className="inv-card__time"
+              text={timeRange}
+              active={entered}
+              startDelay={dTime}
+              charDelay={CHAR_MS}
+            />
             <span className="inv-card__rule" />
           </div>
         </div>
 
-        <div
-          className="inv-card__location inv-card__anim inv-card__anim--from-bottom"
-          style={{ '--d': '1.08s' } as CSSProperties}
-        >
-          <p className="inv-card__location-label">LOCATION</p>
+        <div className="inv-card__location">
+          <TypewriterText
+            as="p"
+            className="inv-card__location-label"
+            text="LOCATION"
+            active={entered}
+            startDelay={dLocLabel}
+            charDelay={CHAR_MS}
+          />
           {mapHref ? (
             <a
               className="inv-card__location-name inv-card__location-name--link"
@@ -265,16 +383,32 @@ export function InvitationCard({ data }: InvitationCardProps) {
               target="_blank"
               rel="noopener noreferrer"
             >
-              {mapAddressLabel}
+              <TypewriterText
+                text={mapAddressLabel}
+                active={entered}
+                startDelay={dAddress}
+                charDelay={CHAR_MS}
+              />
             </a>
           ) : (
-            <p className="inv-card__location-name">{mapAddressLabel}</p>
+            <TypewriterText
+              as="p"
+              className="inv-card__location-name"
+              text={mapAddressLabel}
+              active={entered}
+              startDelay={dAddress}
+              charDelay={CHAR_MS}
+            />
           )}
         </div>
 
         <div
           className="inv-card__actions inv-card__anim inv-card__anim--from-bottom"
-          style={{ '--d': '1.22s' } as CSSProperties}
+          style={
+            {
+              '--d': `${(typeDoneAt / 1000 + 0.15).toFixed(2)}s`,
+            } as CSSProperties
+          }
         >
           {mapHref ? (
             <a
@@ -293,7 +427,6 @@ export function InvitationCard({ data }: InvitationCardProps) {
             </span>
           )}
         </div>
-
       </div>
     </article>
   )

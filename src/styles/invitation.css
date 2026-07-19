@@ -436,6 +436,29 @@
   transform: translate(0, 0) scale(1);
 }
 
+/* ===== Typewriter reveal ===== */
+.typewriter__char {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.12em);
+}
+
+.typewriter__char--run {
+  animation: inv-type-char 0.2s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  animation-delay: var(--char-delay, 0ms);
+}
+
+@keyframes inv-type-char {
+  from {
+    opacity: 0;
+    transform: translateY(0.12em);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .inv-card--entered .inv-sash {
   animation:
     inv-ribbon-drop 2.4s cubic-bezier(0.22, 0.61, 0.36, 1) both,
@@ -506,13 +529,19 @@
   margin: 0.15rem 0 0.7rem;
 }
 
+.inv-card__title-grad .typewriter__char--decorated {
+  position: relative;
+}
+
 .inv-card__cap {
   position: absolute;
-  top: -0.15rem;
-  right: 8%;
-  width: 34px;
+  left: 50%;
+  bottom: calc(100% - 0.42em);
+  width: 0.95em;
   height: auto;
-  transform: rotate(18deg);
+  transform: translateX(-48%) rotate(14deg);
+  transform-origin: 50% 100%;
+  pointer-events: none;
   animation: inv-cap-float 3.6s ease-in-out infinite;
   filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.18));
 }
@@ -522,7 +551,7 @@
   font-style: italic;
   font-weight: 500;
   font-size: clamp(1.55rem, 6.2vw, 2rem);
-  line-height: 1;
+  line-height: 1.35;
   color: var(--ink);
   letter-spacing: 0.01em;
 }
@@ -789,10 +818,10 @@
 @keyframes inv-cap-float {
   0%,
   100% {
-    transform: rotate(18deg) translateY(0);
+    transform: translateX(-48%) rotate(14deg) translateY(0);
   }
   50% {
-    transform: rotate(22deg) translateY(-4px);
+    transform: translateX(-48%) rotate(18deg) translateY(-3px);
   }
 }
 
