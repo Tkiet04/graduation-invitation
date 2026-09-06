@@ -1091,7 +1091,7 @@
 
 @media (max-width: 480px) {
   .inv-sash-pair {
-    --inv-sash-width: 45px;
+    --inv-sash-width: clamp(60px, 16vw, 66px);
   }
 
   .inv-card {
@@ -1107,24 +1107,26 @@
   }
 
   .inv-sash {
-    width: 45px;
-    min-height: 278px;
+    width: var(--inv-sash-width);
+    height: 365px;
+    min-height: 0;
   }
 
   .inv-sash--left {
-    height: 308px;
+    height: 365px;
   }
 
   .inv-sash--right {
-    height: 308px;
+    height: 365px;
   }
 
   .inv-sash--left .inv-sash__inner {
-    padding-top: 0.55rem;
-    padding-bottom: calc(2.1rem + 5px);
+    padding-top: 2.05rem;
+    padding-bottom: 2.8rem;
   }
 
   .inv-sash--right .inv-sash__inner {
-    padding-bottom: calc(2.1rem + 10px);
+    padding-top: 2.05rem;
+    padding-bottom: 2.8rem;
   }
 }
