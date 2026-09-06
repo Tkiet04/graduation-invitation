@@ -29,7 +29,33 @@ export function TypewriterText({
   style,
   decorateChar,
 }: TypewriterTextProps) {
-  const chars = Array.from(text)
+  const tokens = text.split(/(\s+)/)
+  let characterIndex = 0
+
+  function renderCharacter(ch: string, index: number) {
+    const decorated = decorateChar?.index === index
+
+    return (
+      <span
+        key={`${index}-${ch}`}
+        className={[
+          'typewriter__char',
+          active ? 'typewriter__char--run' : '',
+          decorated ? 'typewriter__char--decorated' : '',
+        ]
+          .filter(Boolean)
+          .join(' ')}
+        style={
+          {
+            '--char-delay': `${startDelay + index * charDelay}ms`,
+          } as CSSProperties
+        }
+      >
+        {ch === ' ' ? '\u00A0' : ch}
+        {decorated ? decorateChar.node : null}
+      </span>
+    )
+  }
 
   return (
     <Tag
@@ -37,26 +63,22 @@ export function TypewriterText({
       style={style}
       aria-label={text}
     >
-      {chars.map((ch, i) => {
-        const decorated = decorateChar?.index === i
+      {tokens.map((token, tokenIndex) => {
+        const tokenChars = Array.from(token)
+        const tokenStart = characterIndex
+        characterIndex += tokenChars.length
+
+        if (/^\s+$/.test(token)) {
+          return tokenChars.map((ch, index) =>
+            renderCharacter(ch, tokenStart + index),
+          )
+        }
+
         return (
-          <span
-            key={`${i}-${ch}`}
-            className={[
-              'typewriter__char',
-              active ? 'typewriter__char--run' : '',
-              decorated ? 'typewriter__char--decorated' : '',
-            ]
-              .filter(Boolean)
-              .join(' ')}
-            style={
-              {
-                '--char-delay': `${startDelay + i * charDelay}ms`,
-              } as CSSProperties
-            }
-          >
-            {ch === ' ' ? '\u00A0' : ch}
-            {decorated ? decorateChar.node : null}
+          <span className="typewriter__word" key={`${tokenIndex}-${token}`}>
+            {tokenChars.map((ch, index) =>
+              renderCharacter(ch, tokenStart + index),
+            )}
           </span>
         )
       })}

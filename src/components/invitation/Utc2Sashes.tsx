@@ -43,55 +43,40 @@ export function UtcCapIcon({ className }: { className?: string }) {
 }
 
 interface Utc2SashesProps {
-  schoolCode: string
-  classCode: string
-  major: string
   cohortYears: string
+  graduateName: string
 }
 
 export function Utc2Sashes({
-  schoolCode,
-  classCode,
-  major,
   cohortYears,
+  graduateName,
 }: Utc2SashesProps) {
-  const code = schoolCode.toUpperCase()
-  const klass = classCode.toUpperCase()
-  const majorLabel = major.toUpperCase()
   const years = cohortYears.replace(/^niên\s*khóa\s*/i, '')
 
   return (
     <div className="inv-sash-pair" aria-hidden="true">
       <aside className="inv-sash inv-sash--left">
+        <span className="inv-sash__fold" />
         <div className="inv-sash__inner">
           <UtcEmblem className="inv-sash__emblem" />
-          <p className="inv-sash__kode">{klass}</p>
-          <div className="inv-sash__meta">
-            <p className="inv-sash__line">LỄ TỐT NGHIỆP</p>
-            <p className="inv-sash__major">{majorLabel}</p>
-            <p className="inv-sash__years">NIÊN KHÓA {years}</p>
-          </div>
-          <UtcEmblem className="inv-sash__emblem inv-sash__emblem--bottom" />
+          <p className="inv-sash__letters">U<br />T<br />C<br />2</p>
+          <p className="inv-sash__years">Class of<br />{years.slice(-4)}</p>
+          <span className="inv-sash__spark">✦</span>
         </div>
-        <span className="inv-sash__tassel" />
+        <span className="inv-sash__ornament" />
       </aside>
 
       <aside className="inv-sash inv-sash--right">
+        <span className="inv-sash__fold" />
         <div className="inv-sash__inner">
           <UtcCapIcon className="inv-sash__cap" />
-          <p className="inv-sash__utc">{code}</p>
           <div className="inv-sash__vertical">
-            <span>TRƯỜNG ĐẠI HỌC GIAO THÔNG VẬN TẢI</span>
-            <span className="inv-sash__vertical-sub">PHÂN HIỆU TẠI THÀNH PHỐ</span>
-            <span className="inv-sash__vertical-sub">HỒ CHÍ MINH</span>
+            <span>{graduateName.toUpperCase()}</span>
           </div>
-          <p className="inv-sash__city">
-            HOCHIMINH
-            <br />
-            CITY
-          </p>
+          <span className="inv-sash__major-name">Information Technology</span>
+          <span className="inv-sash__spark">✦</span>
         </div>
-        <span className="inv-sash__tassel" />
+        <span className="inv-sash__ornament" />
       </aside>
     </div>
   )

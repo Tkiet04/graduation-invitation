@@ -73,6 +73,14 @@ export interface InvitationPayload {
   createdAt: string
 }
 
+export interface GuestResponseRow {
+  id: string
+  invitation_id: string
+  attendance_status: 'attending' | 'declined'
+  wish: string
+  created_at: string | Date
+}
+
 function toIso(value: string | Date): string {
   if (value instanceof Date) return value.toISOString()
   return value
@@ -129,6 +137,21 @@ export async function initDb(): Promise<void> {
     )
   `)
 
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS guest_responses (
+      id TEXT PRIMARY KEY,
+      invitation_id TEXT NOT NULL REFERENCES invitations(id) ON DELETE CASCADE,
+      guest_name TEXT NOT NULL DEFAULT '',
+      attendance_status TEXT NOT NULL CHECK (attendance_status IN ('attending', 'declined')),
+      wish TEXT NOT NULL DEFAULT '',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `)
+
+  await pool.query(
+    'CREATE INDEX IF NOT EXISTS guest_responses_invitation_id_idx ON guest_responses(invitation_id)',
+  )
+
   const migrations = [
     `ALTER TABLE invitations ADD COLUMN IF NOT EXISTS time_end TEXT NOT NULL DEFAULT ''`,
     `ALTER TABLE invitations ADD COLUMN IF NOT EXISTS message TEXT NOT NULL DEFAULT ''`,
@@ -138,6 +161,7 @@ export async function initDb(): Promise<void> {
     `ALTER TABLE invitations ADD COLUMN IF NOT EXISTS major TEXT NOT NULL DEFAULT ''`,
     `ALTER TABLE invitations ADD COLUMN IF NOT EXISTS music_url TEXT NOT NULL DEFAULT ''`,
     `ALTER TABLE invitations ADD COLUMN IF NOT EXISTS facebook_info TEXT NOT NULL DEFAULT ''`,
+    `ALTER TABLE guest_responses ADD COLUMN IF NOT EXISTS guest_name TEXT NOT NULL DEFAULT ''`,
   ]
 
   for (const sql of migrations) {

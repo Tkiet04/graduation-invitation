@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom'
 import { MainLayout } from '@/components/layout/MainLayout'
 import { CreatePage } from '@/pages/CreatePage'
 import { InvitationViewPage } from '@/pages/InvitationPage'
+import { ConfirmPage } from '@/pages/ConfirmPage'
 
 export function AppRoutes() {
   return (
@@ -9,6 +10,7 @@ export function AppRoutes() {
       <Route element={<MainLayout />}>
         <Route path="/" element={<CreatePage />} />
         <Route path="/i/:id" element={<InvitationViewPage />} />
+        <Route path="/i/:id/confirm" element={<ConfirmPage />} />
       </Route>
     </Routes>
   )

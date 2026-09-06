@@ -1,4 +1,9 @@
-import type { InvitationFormValues, InvitationRecord } from '@/types/invitation'
+import type {
+  GuestResponseInput,
+  GuestResponseRecord,
+  InvitationFormValues,
+  InvitationRecord,
+} from '@/types/invitation'
 
 const API = '/api/invitations'
 
@@ -40,6 +45,40 @@ export async function deleteInvitation(id: string): Promise<void> {
   if (!res.ok) {
     throw new Error(`Lỗi xóa (${res.status})`)
   }
+}
+
+export async function submitGuestResponse(
+  invitationId: string,
+  input: GuestResponseInput,
+): Promise<GuestResponseRecord> {
+  const res = await fetch(`${API}/${invitationId}/responses`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input),
+  })
+  return parseResponse(res)
+}
+
+export async function getGuestResponse(
+  invitationId: string,
+  responseId: string,
+): Promise<GuestResponseRecord | null> {
+  const res = await fetch(`${API}/${invitationId}/responses/${responseId}`)
+  if (res.status === 404) return null
+  return parseResponse(res)
+}
+
+export async function updateGuestResponse(
+  invitationId: string,
+  responseId: string,
+  input: GuestResponseInput,
+): Promise<GuestResponseRecord> {
+  const res = await fetch(`${API}/${invitationId}/responses/${responseId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input),
+  })
+  return parseResponse(res)
 }
 
 export function getInvitationPublicUrl(id: string): string {

@@ -35,6 +35,130 @@ router.get('/:id', async (req, res) => {
   }
 })
 
+router.get('/:id/responses/:responseId', async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `
+      SELECT id, invitation_id AS "invitationId", guest_name AS "guestName",
+        attendance_status AS "attendanceStatus", wish, created_at AS "createdAt"
+      FROM guest_responses
+      WHERE id = $1 AND invitation_id = $2
+      `,
+      [req.params.responseId, req.params.id],
+    )
+    if (!rows[0]) {
+      res.status(404).json({ error: 'Không tìm thấy phản hồi' })
+      return
+    }
+    res.json(rows[0])
+  } catch (err) {
+    console.error('Get guest response failed:', err)
+    res.status(500).json({ error: 'Không tải được phản hồi' })
+  }
+})
+
+router.post('/:id/responses', async (req, res) => {
+  try {
+    const { rows: invitations } = await pool.query<InvitationRow>(
+      'SELECT id FROM invitations WHERE id = $1',
+      [req.params.id],
+    )
+    if (!invitations[0]) {
+      res.status(404).json({ error: 'Không tìm thấy thư mời' })
+      return
+    }
+
+    const body = req.body as {
+      attendanceStatus?: string
+      guestName?: string
+      wish?: string
+    }
+    const attendanceStatus = body.attendanceStatus
+    if (attendanceStatus !== 'attending' && attendanceStatus !== 'declined') {
+      res.status(400).json({ error: 'Vui lòng chọn trạng thái tham dự' })
+      return
+    }
+
+    const guestName = typeof body.guestName === 'string' ? body.guestName.trim() : ''
+    if (!guestName) {
+      res.status(400).json({ error: 'Vui lòng nhập tên khách mời' })
+      return
+    }
+    if (guestName.length > 120) {
+      res.status(400).json({ error: 'Tên khách mời không được vượt quá 120 ký tự' })
+      return
+    }
+
+    const wish = typeof body.wish === 'string' ? body.wish.trim() : ''
+    if (wish.length > 500) {
+      res.status(400).json({ error: 'Lời chúc không được vượt quá 500 ký tự' })
+      return
+    }
+
+    const id = nanoid(12)
+    const { rows } = await pool.query(
+      `
+      INSERT INTO guest_responses (id, invitation_id, guest_name, attendance_status, wish)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING id, invitation_id AS "invitationId",
+        guest_name AS "guestName", attendance_status AS "attendanceStatus",
+        wish, created_at AS "createdAt"
+      `,
+      [id, req.params.id, guestName, attendanceStatus, wish],
+    )
+
+    res.status(201).json(rows[0])
+  } catch (err) {
+    console.error('Create guest response failed:', err)
+    res.status(500).json({ error: 'Không lưu được xác nhận tham dự' })
+  }
+})
+
+router.put('/:id/responses/:responseId', async (req, res) => {
+  try {
+    const body = req.body as {
+      attendanceStatus?: string
+      guestName?: string
+      wish?: string
+    }
+    const attendanceStatus = body.attendanceStatus
+    const guestName = typeof body.guestName === 'string' ? body.guestName.trim() : ''
+    const wish = typeof body.wish === 'string' ? body.wish.trim() : ''
+
+    if (attendanceStatus !== 'attending' && attendanceStatus !== 'declined') {
+      res.status(400).json({ error: 'Vui lòng chọn trạng thái tham dự' })
+      return
+    }
+    if (!guestName) {
+      res.status(400).json({ error: 'Vui lòng nhập tên khách mời' })
+      return
+    }
+    if (guestName.length > 120 || wish.length > 500) {
+      res.status(400).json({ error: 'Dữ liệu phản hồi vượt quá giới hạn cho phép' })
+      return
+    }
+
+    const { rows } = await pool.query(
+      `
+      UPDATE guest_responses
+      SET guest_name = $1, attendance_status = $2, wish = $3
+      WHERE id = $4 AND invitation_id = $5
+      RETURNING id, invitation_id AS "invitationId", guest_name AS "guestName",
+        attendance_status AS "attendanceStatus", wish, created_at AS "createdAt"
+      `,
+      [guestName, attendanceStatus, wish, req.params.responseId, req.params.id],
+    )
+    if (!rows[0]) {
+      res.status(404).json({ error: 'Không tìm thấy phản hồi' })
+      return
+    }
+    res.json(rows[0])
+  } catch (err) {
+    console.error('Update guest response failed:', err)
+    res.status(500).json({ error: 'Không cập nhật được phản hồi' })
+  }
+})
+
 router.post('/', async (req, res) => {
   try {
     const body = req.body as Omit<

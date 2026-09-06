@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { Link } from 'react-router-dom'
 import type { InvitationFormValues } from '@/types/invitation'
 import {
   formatTimeRange,
@@ -7,11 +8,11 @@ import {
   getWeekdayVi,
   getYear,
 } from '@/utils/dateFormat'
-import { Utc2Sashes } from '@/components/invitation/Utc2Sashes'
 import {
   TypewriterText,
   typewriterDuration,
 } from '@/components/invitation/TypewriterText'
+import { Utc2Sashes } from '@/components/invitation/Utc2Sashes'
 import { getInvitationAudio, playInvitationMusic } from '@/utils/musicPlayer'
 
 const UTC_LOGO = '/decorations/utc-logo.png'
@@ -21,7 +22,7 @@ const CHAR_MS = 26
 const TYPE_START = 420
 
 interface InvitationCardProps {
-  data: InvitationFormValues
+  data: InvitationFormValues & { id?: string }
 }
 
 function PinIcon() {
@@ -71,10 +72,7 @@ export function InvitationCard({ data }: InvitationCardProps) {
   const mapAddressLabel =
     data.locationAddress.trim() ||
     '450-451 Lê Văn Việt, P. Tăng Nhơn Phú A, TP. Thủ Đức, TP.HCM'
-  const schoolCode = (data.schoolCode.trim() || 'UTC2').toUpperCase()
-  const classCode = (data.classCode.trim() || 'K63').toUpperCase()
   const cohortYears = data.cohortYears.trim() || '2022-2026'
-  const major = data.major.trim() || 'CÔNG NGHỆ THÔNG TIN'
   const message =
     data.message.trim() ||
     'Hy vọng trong bức tranh thanh xuân của tớ sẽ có sự góp mặt của cậu'
@@ -192,13 +190,42 @@ export function InvitationCard({ data }: InvitationCardProps) {
       <div className="inv-card__silk" style={bgStyle} aria-hidden="true" />
       <div className="inv-card__shimmer" aria-hidden="true" />
 
-      <img
-        className="inv-card__chibi"
-        src="/decorations/grad-chibi.png"
-        alt=""
-        draggable={false}
-        aria-hidden="true"
-      />
+      {data.id ? (
+        <Link
+          className="inv-card__chibi"
+          to={`/i/${data.id}/confirm`}
+          aria-label="Bấm để xác nhận tham dự và gửi lời chúc"
+        >
+          <img
+            className="inv-card__chibi-image"
+            src="/decorations/grad-chibi.png"
+            alt=""
+            draggable={false}
+            aria-hidden="true"
+          />
+        </Link>
+      ) : (
+        <img
+          className="inv-card__chibi"
+          src="/decorations/grad-chibi.png"
+          alt=""
+          draggable={false}
+          aria-hidden="true"
+        />
+      )}
+      {data.id ? (
+        <Link
+          className="inv-card__attendance-hint"
+          to={`/i/${data.id}/confirm`}
+          aria-label="Xác nhận tham dự"
+        >
+          Vui lòng Click vào tôi để xác nhận tham dự
+        </Link>
+      ) : (
+        <span className="inv-card__attendance-hint">
+          Vui lòng Click vào tôi để xác nhận tham dự
+        </span>
+      )}
 
       <div className="inv-card__corner-contact">
         {contactTel.length >= 8 ? (
@@ -230,10 +257,8 @@ export function InvitationCard({ data }: InvitationCardProps) {
 
       <div className="inv-card__content">
         <Utc2Sashes
-          schoolCode={schoolCode}
-          classCode={classCode}
-          major={major}
           cohortYears={cohortYears}
+          graduateName={nameLabel}
         />
 
         {recipientName && (

@@ -24,6 +24,18 @@ export interface InvitationRecord extends InvitationFormValues {
   createdAt: string
 }
 
+export interface GuestResponseInput {
+  attendanceStatus: 'attending' | 'declined'
+  guestName: string
+  wish: string
+}
+
+export interface GuestResponseRecord extends GuestResponseInput {
+  id: string
+  invitationId: string
+  createdAt: string
+}
+
 export type InvitationFormInput = Omit<InvitationFormValues, 'backgroundImg' | 'mainImg'> & {
   backgroundImg: string | null
   mainImg: string | null
