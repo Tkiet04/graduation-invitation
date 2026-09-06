@@ -1129,4 +1129,8 @@
     padding-top: 2.05rem;
     padding-bottom: 2.8rem;
   }
+
+  .inv-sash__letters {
+    font-size: 1.55rem;
+  }
 }
