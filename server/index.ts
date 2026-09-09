@@ -1,11 +1,15 @@
-import 'dotenv/config'
+import dotenv from 'dotenv'
 import express from 'express'
 import cors from 'cors'
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { initDb, UPLOADS_DIR } from './db.js'
+import { getDbStatus, initDb, UPLOADS_DIR } from './db.js'
 import invitationsRouter from './routes/invitations.js'
+
+// Đảm bảo nạp .env từ thư mục gốc của project
+dotenv.config({ path: path.resolve(process.cwd(), '.env') })
+dotenv.config()
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const PORT = Number(process.env.PORT) || 3001
@@ -22,7 +26,11 @@ app.use('/uploads', express.static(UPLOADS_DIR))
 app.use('/api/invitations', invitationsRouter)
 
 app.get('/api/health', (_req, res) => {
-  res.json({ ok: true, frontend: hasFrontend })
+  res.json({
+    ok: true,
+    frontend: hasFrontend,
+    database: getDbStatus(),
+  })
 })
 
 if (hasFrontend) {
@@ -42,7 +50,7 @@ if (hasFrontend) {
     })
   })
 } else {
-  console.error(`Frontend not found at ${indexHtml}`)
+  console.warn(`Frontend not found at ${indexHtml}`)
   app.get('/', (_req, res) => {
     res
       .status(500)
@@ -51,16 +59,15 @@ if (hasFrontend) {
   })
 }
 
-async function main() {
-  await initDb()
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on port ${PORT}`)
-    console.log(`cwd: ${process.cwd()}`)
-    console.log(`dist: ${distPath} (exists: ${hasFrontend})`)
-  })
-}
+// Bật HTTP server ngay lập tức để Cloud (Render/Railway) và Vite Proxy kết nối được ngay,
+// không bị lỗi 502 Bad Gateway do chờ kết nối database.
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Server running on port ${PORT}`)
+  console.log(`📂 cwd: ${process.cwd()}`)
+  console.log(`📦 dist: ${distPath} (exists: ${hasFrontend})`)
 
-main().catch((err) => {
-  console.error('Failed to start server:', err)
-  process.exit(1)
+  // Khởi tạo DB trong background
+  initDb().catch((err) => {
+    console.error('Lỗi khi khởi động database:', err)
+  })
 })

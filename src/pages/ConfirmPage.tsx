@@ -139,7 +139,7 @@ export function ConfirmPage() {
         <p className="confirm-kicker">{invitation.graduateName || 'Thư mời tốt nghiệp'} trân trọng</p>
         <h1 id="confirm-title">Xác nhận tham dự</h1>
         <p className="confirm-intro">
-          Sự hiện diện của bạn là niềm vinh hạnh của mình. Hãy cho mình biết bạn có thể đến không, và để lại vài dòng nếu muốn nhé.
+          Mình rất mong được đón tiếp bạn trong ngày tốt nghiệp. Hãy cho mình biết bạn có thể đến tham dự không nhé!
         </p>
 
         <form className="confirm-form" onSubmit={handleSubmit}>

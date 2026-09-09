@@ -1,382 +1,294 @@
-/* Envelope intro — phong bì xanh kín + thư trồi ra như cũ */
+/* Envelope Intro — Luồng 2 bước: Bìa thư đóng Bia_Thu.png -> Thư mở open_Letter.png -> Tự động chuyển vào chi tiết thiệp */
 
 .env-scene {
-  --env-blue: #5b7a9d;
-  --env-blue-mid: #6284a4;
-  --env-blue-deep: #3f5a78;
-  --env-blue-dark: #2f4760;
-  --env-cream: #f7f3ec;
-  --env-ink: #1a1a1a;
-  --env-gold: #d4af37;
   position: relative;
   width: 100%;
   max-width: var(--inv-width, 420px);
-  min-height: min(92svh, 820px);
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 1.5rem 1rem 2rem;
-  overflow: hidden;
-  border-radius: 18px;
   isolation: isolate;
 }
 
-.env-scene__sky {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background:
-    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(170, 200, 230, 0.55), transparent 70%),
-    radial-gradient(ellipse 60% 40% at 20% 80%, rgba(200, 220, 240, 0.4), transparent 60%),
-    radial-gradient(ellipse 50% 35% at 85% 70%, rgba(180, 210, 235, 0.35), transparent 55%),
-    linear-gradient(180deg, #e8f1f8 0%, #f4f7fa 45%, #eef3f7 100%);
-  pointer-events: none;
-}
-
+/* Pháo hoa Canvas nằm gọn bên trong thiệp, không bắn tràn ra vùng đen của màn hình */
 .env-confetti {
   position: absolute;
   inset: 0;
-  z-index: 8;
   width: 100%;
   height: 100%;
+  z-index: 25;
   pointer-events: none;
+  border-radius: 18px;
+  overflow: hidden;
 }
 
-.env-scene__title {
+/* Khung hiển thị đồng bộ kích thước 100% với InvitationCard */
+.env-cover {
   position: relative;
-  z-index: 2;
-  text-align: center;
-  margin-bottom: 1.65rem;
-  animation: env-title-in 0.9s ease both;
-}
-
-.env-scene__cap {
-  display: inline-block;
-  width: 36px;
-  margin-bottom: -0.35rem;
-  transform: rotate(-12deg);
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
-}
-
-.env-scene__cap svg {
   width: 100%;
-  height: auto;
-  display: block;
-}
-
-.env-scene__grad {
-  font-family: var(--font-script);
-  font-size: clamp(2.4rem, 10vw, 3.1rem);
-  line-height: 0.95;
-  color: var(--env-blue-deep);
-}
-
-.env-scene__cer {
-  margin-top: -0.2rem;
-  font-family: var(--font-script);
-  font-size: clamp(2rem, 8vw, 2.6rem);
-  font-weight: 400;
-  line-height: 1;
-  color: var(--env-blue);
-}
-
-.env-wrap {
-  position: relative;
-  z-index: 2;
-  width: min(320px, 82vw);
-  border: none;
-  background: none;
+  max-width: var(--inv-width, 420px);
+  aspect-ratio: 9 / 16;
+  min-height: 720px;
+  max-height: min(92svh, 920px);
+  margin: 0 auto;
   padding: 0;
+  border: none;
+  border-radius: 18px;
+  overflow: hidden;
+  background-color: #d2e1ec;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.08),
+    0 22px 50px rgba(10, 25, 45, 0.32);
   cursor: pointer;
-  perspective: 1100px;
+  user-select: none;
   -webkit-tap-highlight-color: transparent;
-  transition: transform 0.35s ease;
-}
-
-.env-wrap:hover:not(:disabled) {
-  transform: translateY(-3px);
-}
-
-.env-wrap:focus-visible {
-  outline: 2px solid var(--env-blue-deep);
-  outline-offset: 10px;
-  border-radius: 8px;
-}
-
-.env-wrap:disabled {
-  cursor: default;
-}
-
-.env {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 1.45 / 1;
-  transform-style: preserve-3d;
-  filter: drop-shadow(0 18px 32px rgba(30, 50, 70, 0.32));
-}
-
-/* ===== Thiệp bên trong — trồi ra như cũ ===== */
-.env__letter {
-  position: absolute;
-  left: 8%;
-  right: 8%;
-  bottom: 22%;
-  z-index: 2;
-  height: 76%;
-  padding: 0.85rem 0.75rem;
-  background: linear-gradient(180deg, #fffef9 0%, var(--env-cream) 100%);
-  border: 1px solid rgba(90, 110, 130, 0.2);
-  border-radius: 4px 4px 2px 2px;
-  box-shadow: 0 4px 14px rgba(30, 50, 70, 0.18);
-  text-align: left;
-  color: var(--env-ink);
-  /* Đóng: nằm trong túi, không hở */
-  transform: translateY(88%);
-  opacity: 0;
-  visibility: hidden;
   transition:
-    transform 1.45s cubic-bezier(0.22, 0.61, 0.36, 1),
-    opacity 0.35s ease,
-    visibility 0s linear 0.35s;
-  overflow: hidden;
-  pointer-events: none;
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.4s ease;
 }
 
-.env-scene--opening .env__letter {
-  visibility: hidden;
-  opacity: 0;
-  transform: translateY(88%);
+.env-cover:hover {
+  transform: translateY(-4px) scale(1.006);
+  box-shadow:
+    0 0 0 1px rgba(212, 175, 55, 0.3),
+    0 26px 58px rgba(10, 25, 45, 0.42);
 }
 
-.env-scene--rising .env__letter {
-  visibility: visible;
-  opacity: 1;
-  z-index: 10;
-  transform: translateY(-58%);
-  transition:
-    transform 1.45s cubic-bezier(0.22, 0.61, 0.36, 1),
-    opacity 0.4s ease 0.12s,
-    visibility 0s linear 0s;
+.env-cover:active {
+  transform: scale(0.988);
 }
 
-.env-scene--exit .env__letter {
-  visibility: visible;
-  opacity: 0;
-  z-index: 10;
-  transform: translateY(-120%) scale(1.08);
-  transition:
-    transform 0.65s cubic-bezier(0.22, 0.61, 0.36, 1),
-    opacity 0.55s ease,
-    visibility 0s linear 0s;
+.env-cover:focus-visible {
+  outline: 2px solid #d4af37;
+  outline-offset: 4px;
 }
 
-.env__letter-from {
-  font-family: var(--font-body);
-  font-size: 0.72rem;
-  margin-bottom: 0.45rem;
-  color: #444;
-}
-
-.env__letter-from strong {
-  color: var(--env-ink);
-  font-weight: 700;
-}
-
-.env__letter-meta {
-  font-family: var(--font-body);
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  margin-bottom: 0.35rem;
-}
-
-.env__letter-place {
-  font-family: var(--font-serif);
-  font-size: 0.65rem;
-  font-style: italic;
-  color: #555;
-  line-height: 1.35;
-  margin-bottom: 0.55rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.env__letter-msg {
-  font-family: var(--font-serif);
-  font-size: 0.68rem;
-  font-style: italic;
-  color: #666;
-  line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-/* ===== Vỏ phong bì xanh kín ===== */
-.env__shell {
-  position: absolute;
-  inset: 0;
-  z-index: 4;
-  border-radius: 6px;
-  overflow: visible;
-  transform-style: preserve-3d;
-}
-
-.env__panel {
-  position: absolute;
-  inset: 0;
-}
-
-.env__panel--back {
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.12), transparent 45%),
-    linear-gradient(180deg, #6a89a8 0%, var(--env-blue) 45%, var(--env-blue-deep) 100%);
-  border-radius: 6px;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
-}
-
-.env__panel--left {
-  clip-path: polygon(0 0, 50% 50%, 0 100%);
-  background: linear-gradient(115deg, #7a99b6 0%, var(--env-blue-deep) 100%);
-  opacity: 0.92;
-}
-
-.env__panel--right {
-  clip-path: polygon(100% 0, 50% 50%, 100% 100%);
-  background: linear-gradient(245deg, #7a99b6 0%, var(--env-blue-dark) 100%);
-  opacity: 0.92;
-}
-
-.env__panel--bottom {
-  clip-path: polygon(0 100%, 50% 50%, 100% 100%);
-  background: linear-gradient(180deg, var(--env-blue) 0%, var(--env-blue-dark) 100%);
-  opacity: 0.97;
-}
-
-/* Nắp trên xanh — úp kín xuống giữa */
-.env__flap {
-  position: absolute;
-  inset: 0;
-  z-index: 5;
-  background: linear-gradient(180deg, #7a99b6 0%, var(--env-blue) 50%, var(--env-blue-deep) 100%);
-  clip-path: polygon(0 0, 100% 0, 50% 58%);
-  transform-origin: top center;
-  transform: rotateX(0deg);
-  transform-style: preserve-3d;
-  transition: transform 1s cubic-bezier(0.4, 0.05, 0.2, 1);
-  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.22);
-  backface-visibility: hidden;
-}
-
-.env-scene--opening .env__flap,
-.env-scene--rising .env__flap,
-.env-scene--exit .env__flap {
-  transform: rotateX(175deg);
-}
-
-/* ===== Dấu sáp vàng UTC2 ===== */
-.env__wax {
-  position: absolute;
-  left: 50%;
-  top: 52%;
-  z-index: 6;
-  width: 64px;
-  height: 64px;
-  transform: translate(-50%, -50%);
-  display: grid;
-  place-items: center;
-  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.35));
-  transition:
-    opacity 0.55s ease,
-    transform 0.55s cubic-bezier(0.4, 0.05, 0.2, 1);
-}
-
-.env__wax-ring {
+/* Layer 1: open_Letter.png (Nằm sẵn bên dưới, z-index: 1) */
+.env-cover__img--opened {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-}
-
-.env__wax-text {
-  position: relative;
+  object-fit: cover;
+  object-position: center;
+  display: block;
   z-index: 1;
-  font-family: var(--font-body);
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  color: var(--env-gold);
-}
-
-.env-scene--opening .env__wax,
-.env-scene--rising .env__wax,
-.env-scene--exit .env__wax {
-  opacity: 0;
-  transform: translate(-50%, -50%) scale(0.7);
+  border-radius: 18px;
   pointer-events: none;
 }
 
-.env-scene__hint {
-  position: relative;
+/* Nội dung chữ trên giấy thư mời: Dear khách mời, Ngày, Giờ từ database */
+.env-letter {
+  position: absolute;
+  top: 42.5%;
+  left: 50%;
+  transform: translate(-50%, 6px);
+  width: 62%;
+  max-width: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
   z-index: 2;
-  margin-top: 1.5rem;
+  pointer-events: none;
+  user-select: none;
+  background: transparent;
+  opacity: 0;
+  transition:
+    opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.12s,
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.12s;
+}
+
+/* Khi mở: chữ in trên giấy thư hiện ra mượt mà */
+.env-scene--opened .env-letter,
+.env-scene--exit .env-letter {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.env-letter__dear {
+  margin: 0 0 clamp(0.95rem, 3.2vw, 1.55rem) 0;
+  font-family: var(--font-serif);
+  font-size: clamp(0.85rem, 2.6vw, 1.05rem);
+  font-weight: 500;
+  color: #1a283e;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.3em;
+  max-width: 100%;
+}
+
+.env-letter__dear-label {
+  font-style: normal;
+  font-weight: 500;
+  color: #2c3c52;
+}
+
+.env-letter__dear-name {
+  font-style: normal;
+  font-weight: 600;
+  color: #0f1d32;
+}
+
+.env-letter__date {
+  margin: 0 0 0.3rem 0;
+  font-family: var(--font-serif);
+  font-size: clamp(1.05rem, 3.4vw, 1.35rem);
+  font-weight: 600;
+  color: #122138;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.env-letter__time {
+  margin: 0;
   font-family: var(--font-body);
-  font-size: 0.82rem;
-  letter-spacing: 0.06em;
-  color: var(--env-blue-deep);
-  animation: env-hint-pulse 1.8s ease-in-out infinite;
+  font-size: clamp(0.68rem, 2.1vw, 0.82rem);
+  font-weight: 500;
+  color: #3b4d66;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1.25;
+  white-space: nowrap;
 }
 
-.env-scene--exit {
-  animation: env-scene-out 0.7s ease forwards;
+/* Layer 2: Bia_Thu.png (Nằm đè bên trên, z-index: 4, che kín open_Letter khi closed) */
+.env-cover__img--closed {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  z-index: 4;
+  border-radius: 18px;
+  pointer-events: none;
+  opacity: 1;
+  transform: scale(1);
+  transition:
+    opacity 0.5s ease,
+    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@keyframes env-title-in {
-  from {
-    opacity: 0;
-    transform: translateY(-12px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Khi mở: Bia_Thu.png mờ dần và scale nhẹ để lộ bức thư mở bên dưới mượt mà, không bị chớp đen */
+.env-scene--opened .env-cover__img--closed,
+.env-scene--exit .env-cover__img--closed {
+  opacity: 0;
+  transform: scale(1.04);
+  pointer-events: none;
 }
 
-@keyframes env-hint-pulse {
+/* Hiệu ứng ánh sáng con dấu sáp ở bìa thư đóng */
+.env-cover__seal-glow {
+  position: absolute;
+  top: 62.8%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(240, 216, 120, 0.55) 0%,
+    rgba(212, 175, 55, 0.35) 40%,
+    rgba(212, 175, 55, 0) 70%
+  );
+  pointer-events: none;
+  mix-blend-mode: screen;
+  z-index: 5;
+  animation: env-seal-glow-pulse 2.2s ease-in-out infinite;
+  transition: transform 0.5s ease, opacity 0.4s ease;
+}
 
-  0%,
-  100% {
+.env-cover__seal-ripple {
+  position: absolute;
+  top: 62.8%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(240, 216, 120, 0.6);
+  pointer-events: none;
+  z-index: 5;
+  animation: env-seal-ripple-wave 2.6s cubic-bezier(0.2, 0.6, 0.35, 1) infinite;
+  transition: opacity 0.4s ease;
+}
+
+.env-scene--opened .env-cover__seal-glow,
+.env-scene--opened .env-cover__seal-ripple,
+.env-scene--exit .env-cover__seal-glow,
+.env-scene--exit .env-cover__seal-ripple {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(3);
+  pointer-events: none;
+}
+/* 4. PHASE THOÁT VÀO CHI TIẾT THIỆP (EXIT) */
+.env-scene--exit .env-cover {
+  transform: translateY(-26px) scale(0.96);
+  opacity: 0;
+  filter: blur(4px);
+  transition:
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.5s ease,
+    filter 0.5s ease;
+}
+
+/* Keyframe Animations */
+@keyframes env-seal-glow-pulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(0.95);
     opacity: 0.55;
   }
-
   50% {
-    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.18);
+    opacity: 0.95;
   }
 }
 
-@keyframes env-scene-out {
-  to {
+@keyframes env-seal-ripple-wave {
+  0% {
+    transform: translate(-50%, -50%) scale(0.85);
+    opacity: 0.8;
+  }
+  70% {
+    transform: translate(-50%, -50%) scale(1.65);
     opacity: 0;
-    transform: scale(0.96);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.65);
+    opacity: 0;
   }
 }
 
+/* Responsive Mobile */
 @media (max-width: 480px) {
   .env-scene {
+    max-width: 100%;
+    min-height: 100svh;
+  }
+
+  .env-cover {
     max-width: 100%;
     min-height: 100svh;
     border-radius: 0;
   }
 
-  .env__wax {
-    width: 58px;
-    height: 58px;
+  .env-cover__img--opened,
+  .env-cover__img--closed {
+    border-radius: 0;
+  }
+
+  .env-confetti {
+    border-radius: 0;
   }
 }

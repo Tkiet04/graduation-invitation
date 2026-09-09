@@ -52,6 +52,7 @@ export function Utc2Sashes({
   graduateName,
 }: Utc2SashesProps) {
   const years = cohortYears.replace(/^niên\s*khóa\s*/i, '')
+  const nameUpper = (graduateName || '').normalize('NFC').toUpperCase()
 
   return (
     <div className="inv-sash-pair" aria-hidden="true">
@@ -71,7 +72,7 @@ export function Utc2Sashes({
         <div className="inv-sash__inner">
           <UtcCapIcon className="inv-sash__cap" />
           <div className="inv-sash__vertical">
-            <span>{graduateName.toUpperCase()}</span>
+            <span>{nameUpper}</span>
           </div>
           <span className="inv-sash__major-name">Information Technology</span>
           <span className="inv-sash__spark">✦</span>

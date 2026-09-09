@@ -368,31 +368,7 @@
   text-shadow: 0 0 8px rgba(212, 175, 55, 0.35);
 }
 
-.inv-sash__vertical {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.4rem;
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  transform: rotate(180deg);
-  font-family: var(--font-display);
-  font-size: calc(0.42rem + 0.5px);
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  line-height: 1.15;
-  max-height: 148px;
-  margin: 0.15rem 0;
-}
 
-.inv-sash--right .inv-sash__vertical {
-  /* Tên trường · phân hiệu thấp xuống 20px */
-  margin-top: calc(0.15rem + 20px);
-}
-
-.inv-sash__vertical > span {
-  white-space: nowrap;
-}
 
 .inv-sash__vertical-sub {
   font-size: inherit;
@@ -548,17 +524,28 @@
 }
 
 .inv-sash__vertical {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 0.3rem;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
   max-height: 188px;
-  margin: 1rem 0 0;
+  margin: 0.85rem 0 0;
   color: #fff;
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 0.8rem;
+  font-family: 'Times New Roman', 'Cormorant Garamond', serif;
+  font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: -0.035em;
-  word-spacing: 0.12em;
-  line-height: 0.95;
+  letter-spacing: 0.05em;
+  word-spacing: 0.22em;
+  line-height: 1;
   text-align: center;
+  white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.inv-sash__vertical > span {
   white-space: nowrap;
 }
 
