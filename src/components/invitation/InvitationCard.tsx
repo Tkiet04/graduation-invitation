@@ -14,6 +14,7 @@ import {
 } from '@/components/invitation/TypewriterText'
 import { Utc2Sashes } from '@/components/invitation/Utc2Sashes'
 import { getInvitationAudio, playInvitationMusic } from '@/utils/musicPlayer'
+import { DEMO_FORM } from '@/constants/invitationData'
 
 const UTC_LOGO = '/decorations/utc-logo.png'
 import '@/styles/invitation.css'
@@ -62,42 +63,54 @@ function GradCapIcon() {
 }
 
 export function InvitationCard({ data }: InvitationCardProps) {
-  const nameLabel = data.graduateName.trim() || 'Nguyễn Tuấn Kiệt'
+  const nameLabel = data.graduateName?.trim() || DEMO_FORM.graduateName
   const schoolLabel =
-    (data.locationText.trim() ||
-      'TRƯỜNG ĐẠI HỌC GIAO THÔNG VẬN TẢI PHÂN HIỆU TẠI TP.HCM').replace(
+    (data.locationText?.trim() || DEMO_FORM.locationText).replace(
       /\s*[-–—]\s*/g,
       ' ',
     )
   const mapAddressLabel =
-    data.locationAddress.trim() ||
-    '450-451 Lê Văn Việt, P. Tăng Nhơn Phú A, TP. Thủ Đức, TP.HCM'
-  const cohortYears = data.cohortYears.trim() || '2022-2026'
-  const message =
-    data.message.trim() ||
-    'Hy vọng trong bức tranh thanh xuân của tớ sẽ có sự góp mặt của cậu'
-  const weekday = getWeekdayVi(data.date)
-  const month = getMonthEn(data.date)
-  const day = getDayNumber(data.date)
-  const year = getYear(data.date)
-  const timeRange = formatTimeRange(data.time, data.timeEnd)
+    data.locationAddress?.trim() || DEMO_FORM.locationAddress
+  const cohortYears = data.cohortYears?.trim() || DEMO_FORM.cohortYears
+  const message = data.message?.trim() || DEMO_FORM.message
+  const dateValue = data.date?.trim() || DEMO_FORM.date
+  const timeValue = data.time?.trim() || DEMO_FORM.time
+  const timeEndValue = data.timeEnd?.trim() || DEMO_FORM.timeEnd
+  const weekday = getWeekdayVi(dateValue)
+  const month = getMonthEn(dateValue)
+  const day = getDayNumber(dateValue)
+  const year = getYear(dateValue)
+  const timeRange = formatTimeRange(timeValue, timeEndValue)
   const mapHref =
-    data.locationMap.trim() ||
-    (data.locationAddress
-      ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(data.locationAddress)}`
-      : undefined)
-  const contactLabel = data.contactInfo.trim() || '0901 234 567'
+    data.locationMap?.trim() ||
+    (data.locationAddress?.trim()
+      ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(data.locationAddress.trim())}`
+      : DEMO_FORM.locationMap)
+  const contactLabel = data.contactInfo?.trim() || DEMO_FORM.contactInfo
   const contactTel = contactLabel.replace(/[^\d+]/g, '')
-  const facebookRaw = data.facebookInfo.trim() || 'facebook.com/tuankiet'
+  const DEFAULT_FB_HREF = DEMO_FORM.facebookInfo
+  const rawFb = (data.facebookInfo || '').trim()
+  const facebookRaw =
+    !rawFb || rawFb === 'facebook.com/tuankiet' || rawFb === 'tuankiet'
+      ? DEFAULT_FB_HREF
+      : rawFb
   const facebookHref = /^https?:\/\//i.test(facebookRaw)
     ? facebookRaw
     : facebookRaw.includes('facebook.com')
       ? `https://${facebookRaw.replace(/^\/+/, '')}`
       : `https://www.facebook.com/${facebookRaw.replace(/^@/, '')}`
-  const facebookDisplay = facebookRaw
-    .replace(/^https?:\/\//i, '')
-    .replace(/^www\./i, '')
-    .replace(/^facebook\.com\//i, '')
+  let facebookDisplay = 'tuankiet'
+  if (facebookHref === DEFAULT_FB_HREF || facebookHref.includes('1KBhxoLhsb')) {
+    facebookDisplay = 'tuankiet'
+  } else if (rawFb) {
+    const cleaned = rawFb
+      .replace(/^https?:\/\//i, '')
+      .replace(/^www\./i, '')
+      .replace(/^facebook\.com\//i, '')
+      .replace(/^@/, '')
+      .replace(/\/+$/, '')
+    facebookDisplay = cleaned && !cleaned.includes('/') && !cleaned.includes('?') ? cleaned : 'tuankiet'
+  }
 
   const recipientName = data.recipientName.trim()
   const dearPrefix = 'Dear: '
@@ -283,7 +296,7 @@ export function InvitationCard({ data }: InvitationCardProps) {
           <img
             className="inv-card__logo-img inv-card__anim inv-card__anim--from-top"
             style={{ '--d': '0.15s' } as CSSProperties}
-            src={data.mainImg.trim() || UTC_LOGO}
+            src={data.mainImg?.trim() || DEMO_FORM.mainImg || UTC_LOGO}
             alt="Logo Trường Đại học Giao thông Vận tải"
           />
           <TypewriterText

@@ -8,6 +8,7 @@ import {
 } from '@/utils/dateFormat'
 import { playInvitationMusic } from '@/utils/musicPlayer'
 import { ConfettiBurst } from '@/components/invitation/ConfettiBurst'
+import { DEMO_FORM } from '@/constants/invitationData'
 import '@/styles/envelope.css'
 
 interface EnvelopeIntroProps {
@@ -23,16 +24,23 @@ export function EnvelopeIntro({ data, onOpened }: EnvelopeIntroProps) {
   const autoTimerRef = useRef<number | null>(null)
 
   // Lấy dữ liệu tên khách mời và thời gian từ database
-  const recipient = data.recipientName?.trim() || 'Bạn thân yêu'
-  const day = getDayNumber(data.date)
-  const month = getMonthEn(data.date)
-  const year = getYear(data.date)
+  const recipient = data.recipientName?.trim() || DEMO_FORM.recipientName
+  const dateValue = data.date?.trim() || DEMO_FORM.date
+  const day = getDayNumber(dateValue)
+  const month = getMonthEn(dateValue)
+  const year = getYear(dateValue)
   const displayDate =
     day !== '--' && month !== '—' && year !== '----'
       ? `${day} ${month} ${year}`
-      : data.date?.trim() || '28 JUNE 2026'
-  const timeFormatted = formatTimeRange(data.time, data.timeEnd)
-  const displayTime = timeFormatted !== '--:--' ? timeFormatted : '8H - 13H00'
+      : dateValue
+  const timeFormatted = formatTimeRange(
+    data.time || DEMO_FORM.time,
+    data.timeEnd || DEMO_FORM.timeEnd,
+  )
+  const displayTime =
+    timeFormatted !== '--:--'
+      ? timeFormatted
+      : formatTimeRange(DEMO_FORM.time, DEMO_FORM.timeEnd)
 
   // 1. Tự động chuyển từ 'opened' sang 'exit' sau 2.8s để vào chi tiết thiệp
   useEffect(() => {
