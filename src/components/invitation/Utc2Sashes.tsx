@@ -74,7 +74,7 @@ export function Utc2Sashes({
           <div className="inv-sash__vertical">
             <span>{nameUpper}</span>
           </div>
-          <span className="inv-sash__major-name">Information Technology</span>
+          <span className="inv-sash__major-name">Information<br />Technology</span>
           <span className="inv-sash__spark">✦</span>
         </div>
         <span className="inv-sash__ornament" />

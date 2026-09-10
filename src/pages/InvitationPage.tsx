@@ -5,6 +5,7 @@ import { EnvelopeIntro } from '@/components/invitation/EnvelopeIntro'
 import { QrShareBox } from '@/components/form/QrShareBox'
 import { getInvitation } from '@/services/invitationApi'
 import type { InvitationRecord } from '@/types/invitation'
+import { DEMO_FORM } from '@/constants/invitationData'
 import '@/styles/form.css'
 
 export function InvitationViewPage() {
@@ -23,6 +24,22 @@ export function InvitationViewPage() {
   useEffect(() => {
     if (!id) {
       setNotFound(true)
+      setLoading(false)
+      return
+    }
+
+    if (id === 'demo') {
+      setInvitation({
+        ...DEMO_FORM,
+        id: 'demo',
+        recipientName: 'TUẤN DUY',
+        date: '2026-09-26',
+        time: '10:30',
+        timeEnd: '11:30',
+        createdAt: new Date().toISOString(),
+      })
+      setNotFound(false)
+      setShowEnvelope(!skipEnvelope)
       setLoading(false)
       return
     }
