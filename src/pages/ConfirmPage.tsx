@@ -7,6 +7,7 @@ import {
   updateGuestResponse,
 } from '@/services/invitationApi'
 import type { InvitationRecord } from '@/types/invitation'
+import { DEMO_FORM } from '@/constants/invitationData'
 import '@/styles/confirmation.css'
 
 type AttendanceStatus = 'attending' | 'declined'
@@ -41,13 +42,34 @@ export function ConfirmPage() {
 
     async function loadInvitationAndResponse() {
       try {
-        const data = await getInvitation(invitationId)
+        const data =
+          invitationId === 'demo'
+            ? {
+                ...DEMO_FORM,
+                id: 'demo',
+                recipientName: 'TUẤN DUY',
+                date: '2026-09-26',
+                time: '10:30',
+                timeEnd: '11:30',
+                createdAt: new Date().toISOString(),
+              }
+            : await getInvitation(invitationId)
+
         if (cancelled) return
         setInvitation(data)
         if (!data) return
 
+        // Mặc định tên khách mời lấy theo dữ liệu của thiệp trong DB
+        if (data.recipientName?.trim()) {
+          setGuestName(data.recipientName.trim())
+        }
+
         const savedResponseId = window.localStorage.getItem(storageKey)
         if (!savedResponseId) return
+
+        if (invitationId === 'demo') {
+          return
+        }
 
         const response = await getGuestResponse(invitationId, savedResponseId)
         if (cancelled) return
@@ -58,7 +80,9 @@ export function ConfirmPage() {
 
         setResponseId(response.id)
         setStatus(response.attendanceStatus)
-        setGuestName(response.guestName)
+        if (response.guestName?.trim()) {
+          setGuestName(response.guestName.trim())
+        }
         setWish(response.wish)
         setSubmitted(true)
       } catch {
@@ -92,6 +116,10 @@ export function ConfirmPage() {
         attendanceStatus: status,
         guestName: guestName.trim(),
         wish,
+      }
+      if (id === 'demo') {
+        setSubmitted(true)
+        return
       }
       const response = responseId
         ? await updateGuestResponse(id, responseId, input)
@@ -168,14 +196,14 @@ export function ConfirmPage() {
                   value={guestName}
                   maxLength={120}
                   onChange={(event) => setGuestName(event.target.value)}
-                  placeholder="Nhập tên của bạn..."
+                  placeholder={invitation.recipientName || 'Nhập tên của bạn...'}
                   autoComplete="name"
                   required
                 />
               </label>
 
               <label className="confirm-field">
-                <span>Lời chúc gửi đến</span>
+                <span>Lời chúc thân thương</span>
                 <textarea
                   value={wish}
                   maxLength={500}
@@ -201,13 +229,13 @@ export function ConfirmPage() {
             <span className="confirm-success__mark" aria-hidden="true">✓</span>
             <p className="confirm-success__message">
               {status === 'attending'
-                ? `Cảm ơn ${guestDisplayName} đã xác nhận tham dự! Hẹn gặp ngày ${eventDate}.`
-                : `Cảm ơn ${guestDisplayName} đã phản hồi. Rất tiếc vì không thể đón tiếp bạn lần này!`}
+                ? `Cảm ơn bạn đã xác nhận tham dự! Hẹn gặp bạn ngày ${eventDate}.`
+                : `Cảm ơn bạn đã phản hồi. Rất tiếc vì không thể đón tiếp bạn lần này!`}
             </p>
             {wish.trim() && (
               <section className="confirm-wish" aria-label="Lời chúc đã gửi">
-                <p className="confirm-wish__kicker">LỜI NHẮN GỬI</p>
-                <h2>Lời chúc từ bạn bè</h2>
+                <p className="confirm-wish__kicker">GÓC KỶ NIỆM</p>
+                <h2>Những lời chúc yêu thương</h2>
                 <div className="confirm-wish__card">
                   <p>{wish.trim()}</p>
                   <strong>{guestDisplayName}</strong>
