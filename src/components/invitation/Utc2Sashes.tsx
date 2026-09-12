@@ -61,7 +61,7 @@ export function Utc2Sashes({
         <div className="inv-sash__inner">
           <UtcEmblem className="inv-sash__emblem" />
           <p className="inv-sash__letters">U<br />T<br />C<br />2</p>
-          <p className="inv-sash__years">Class of<br />{years.slice(-4)}</p>
+          <p className="inv-sash__years">Class of<br />09/{years.slice(-4)}</p>
           <span className="inv-sash__spark">✦</span>
         </div>
         <span className="inv-sash__ornament" />
