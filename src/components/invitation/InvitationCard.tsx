@@ -84,7 +84,7 @@ export function InvitationCard({ data }: InvitationCardProps) {
   const mapHref =
     data.locationMap?.trim() ||
     (data.locationAddress?.trim()
-      ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(data.locationAddress.trim())}`
+      ? `${encodeURIComponent(data.locationAddress.trim())}`
       : DEMO_FORM.locationMap)
   const contactLabel = data.contactInfo?.trim() || DEMO_FORM.contactInfo
   const contactTel = contactLabel.replace(/[^\d+]/g, '')
