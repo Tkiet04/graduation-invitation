@@ -22,8 +22,13 @@ import '@/styles/invitation.css'
 const CHAR_MS = 26
 const TYPE_START = 420
 
+import type { GuestResponseRecord } from '@/types/invitation'
+
 interface InvitationCardProps {
-  data: InvitationFormValues & { id?: string }
+  data: InvitationFormValues & {
+    id?: string
+    latestResponse?: GuestResponseRecord | null
+  }
 }
 
 function PinIcon() {

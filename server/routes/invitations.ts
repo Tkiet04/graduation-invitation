@@ -6,11 +6,37 @@ import { deleteInvitationFiles, saveImageField } from '../imageStore.js'
 const router = Router()
 
 router.get('/', async (_req, res) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
   try {
     const { rows } = await pool.query<InvitationRow>(
       'SELECT * FROM invitations ORDER BY created_at DESC',
     )
-    res.json(rows.map(rowToRecord))
+    const { rows: responseRows } = await pool.query<{
+      id: string
+      invitationId: string
+      guestName: string
+      attendanceStatus: 'attending' | 'declined'
+      wish: string
+      createdAt: string
+    }>(
+      `
+      SELECT id, invitation_id AS "invitationId", guest_name AS "guestName",
+        attendance_status AS "attendanceStatus", wish, created_at AS "createdAt"
+      FROM guest_responses
+      ORDER BY created_at DESC
+      `,
+    )
+    const responseMap = new Map<string, typeof responseRows[0]>()
+    for (const resp of responseRows) {
+      if (!responseMap.has(resp.invitationId)) {
+        responseMap.set(resp.invitationId, resp)
+      }
+    }
+    const results = rows.map((row) => ({
+      ...rowToRecord(row),
+      latestResponse: responseMap.get(row.id) ?? null,
+    }))
+    res.json(results)
   } catch (err) {
     console.error('List invitations failed:', err)
     res.status(500).json({ error: 'Không tải được danh sách thư mời' })
@@ -18,6 +44,7 @@ router.get('/', async (_req, res) => {
 })
 
 router.get('/:id', async (req, res) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
   try {
     const { rows } = await pool.query<InvitationRow>(
       'SELECT * FROM invitations WHERE id = $1',
@@ -28,10 +55,44 @@ router.get('/:id', async (req, res) => {
       res.status(404).json({ error: 'Không tìm thấy thư mời' })
       return
     }
-    res.json(rowToRecord(row))
+    const invitation = rowToRecord(row)
+    const { rows: responseRows } = await pool.query(
+      `
+      SELECT id, invitation_id AS "invitationId", guest_name AS "guestName",
+        attendance_status AS "attendanceStatus", wish, created_at AS "createdAt"
+      FROM guest_responses
+      WHERE invitation_id = $1
+      ORDER BY created_at DESC
+      `,
+      [req.params.id],
+    )
+    res.json({
+      ...invitation,
+      latestResponse: responseRows[0] ?? null,
+      responses: responseRows,
+    })
   } catch (err) {
     console.error('Get invitation failed:', err)
     res.status(500).json({ error: 'Không tải được thư mời' })
+  }
+})
+
+router.get('/:id/responses', async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `
+      SELECT id, invitation_id AS "invitationId", guest_name AS "guestName",
+        attendance_status AS "attendanceStatus", wish, created_at AS "createdAt"
+      FROM guest_responses
+      WHERE invitation_id = $1
+      ORDER BY created_at DESC
+      `,
+      [req.params.id],
+    )
+    res.json(rows)
+  } catch (err) {
+    console.error('List guest responses failed:', err)
+    res.status(500).json({ error: 'Không tải được danh sách phản hồi' })
   }
 })
 

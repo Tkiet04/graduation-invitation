@@ -59,6 +59,13 @@ export async function submitGuestResponse(
   return parseResponse(res)
 }
 
+export async function getGuestResponses(
+  invitationId: string,
+): Promise<GuestResponseRecord[]> {
+  const res = await fetch(`${API}/${invitationId}/responses`)
+  return parseResponse(res)
+}
+
 export async function getGuestResponse(
   invitationId: string,
   responseId: string,

@@ -22,6 +22,8 @@ export interface InvitationFormValues {
 export interface InvitationRecord extends InvitationFormValues {
   id: string
   createdAt: string
+  latestResponse?: GuestResponseRecord | null
+  responses?: GuestResponseRecord[]
 }
 
 export interface GuestResponseInput {

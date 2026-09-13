@@ -336,6 +336,38 @@ export const pool = {
       return { rows: [mapped] as T[], rowCount: 1 }
     }
 
+    // 4b. SELECT ... FROM guest_responses WHERE invitation_id = $1
+    if (/FROM guest_responses WHERE invitation_id = \$1/i.test(cleanSql)) {
+      const [invitationId] = params
+      const matches = db.guest_responses
+        .filter((r) => r.invitation_id === invitationId)
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        .map((found): GuestResponsePayload => ({
+          id: found.id,
+          invitationId: found.invitation_id,
+          guestName: found.guest_name,
+          attendanceStatus: found.attendance_status,
+          wish: found.wish,
+          createdAt: found.created_at,
+        }))
+      return { rows: matches as T[], rowCount: matches.length }
+    }
+
+    // 4c. SELECT ... FROM guest_responses ORDER BY created_at DESC (lấy toàn bộ)
+    if (/FROM guest_responses/i.test(cleanSql) && !/WHERE/i.test(cleanSql)) {
+      const matches = [...db.guest_responses]
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        .map((found): GuestResponsePayload => ({
+          id: found.id,
+          invitationId: found.invitation_id,
+          guestName: found.guest_name,
+          attendanceStatus: found.attendance_status,
+          wish: found.wish,
+          createdAt: found.created_at,
+        }))
+      return { rows: matches as T[], rowCount: matches.length }
+    }
+
     // 5. INSERT INTO invitations
     if (/^INSERT INTO invitations/i.test(cleanSql)) {
       const newRow: InvitationRow = {

@@ -104,6 +104,85 @@ export function InvitationViewPage() {
           <InvitationCard data={invitation} />
           {isCreator && (
             <>
+              {invitation.latestResponse && (
+                <div
+                  style={{
+                    maxWidth: '420px',
+                    width: '100%',
+                    margin: '1.25rem auto 0',
+                    padding: '1.1rem 1.25rem',
+                    borderRadius: '16px',
+                    background: 'rgba(255, 255, 255, 0.95)',
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
+                    border: '1px solid rgba(201, 166, 91, 0.35)',
+                    textAlign: 'center',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.4rem',
+                      marginBottom: '0.5rem',
+                    }}
+                  >
+                    <span style={{ fontSize: '1.15rem' }}>💌</span>
+                    <span
+                      style={{
+                        fontWeight: 700,
+                        color: '#10284c',
+                        fontSize: '0.95rem',
+                      }}
+                    >
+                      Phản hồi từ{' '}
+                      {invitation.latestResponse.guestName ||
+                        invitation.recipientName}
+                    </span>
+                  </div>
+                  <div style={{ marginBottom: '0.6rem' }}>
+                    <span
+                      className={`badge-status ${
+                        invitation.latestResponse.attendanceStatus === 'attending'
+                          ? 'badge-status--attending'
+                          : 'badge-status--declined'
+                      }`}
+                    >
+                      {invitation.latestResponse.attendanceStatus === 'attending'
+                        ? '✓ Sẽ có mặt tham dự'
+                        : '✕ Xin phép vắng mặt'}
+                    </span>
+                  </div>
+                  {invitation.latestResponse.wish?.trim() ? (
+                    <p
+                      style={{
+                        fontStyle: 'italic',
+                        color: '#374151',
+                        fontSize: '0.9rem',
+                        margin: '0.5rem 0 0',
+                        lineHeight: 1.5,
+                        background: '#fdfbf7',
+                        padding: '0.65rem 0.85rem',
+                        borderRadius: '8px',
+                        borderLeft: '3px solid #c9a65b',
+                      }}
+                    >
+                      “{invitation.latestResponse.wish.trim()}”
+                    </p>
+                  ) : (
+                    <p
+                      style={{
+                        fontStyle: 'italic',
+                        color: '#9ca3af',
+                        fontSize: '0.82rem',
+                        margin: 0,
+                      }}
+                    >
+                      (Khách mời chưa để lại lời chúc)
+                    </p>
+                  )}
+                </div>
+              )}
               <QrShareBox invitation={invitation} />
               <Link className="btn btn--ghost" to="/">
                 ← Tạo thư mời khác
