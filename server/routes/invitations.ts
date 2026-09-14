@@ -5,11 +5,58 @@ import { deleteInvitationFiles, saveImageField } from '../imageStore.js'
 
 const router = Router()
 
+// router.get('/', async (_req, res) => {
+//   res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+//   try {
+//     const { rows } = await pool.query<InvitationRow>(
+//       'SELECT * FROM invitations ORDER BY created_at DESC',
+//     )
+//     const { rows: responseRows } = await pool.query<{
+//       id: string
+//       invitationId: string
+//       guestName: string
+//       attendanceStatus: 'attending' | 'declined'
+//       wish: string
+//       createdAt: string
+//     }>(
+//       `
+//       SELECT id, invitation_id AS "invitationId", guest_name AS "guestName",
+//         attendance_status AS "attendanceStatus", wish, created_at AS "createdAt"
+//       FROM guest_responses
+//       ORDER BY created_at DESC
+//       `,
+//     )
+//     const responseMap = new Map<string, typeof responseRows[0]>()
+//     for (const resp of responseRows) {
+//       if (!responseMap.has(resp.invitationId)) {
+//         responseMap.set(resp.invitationId, resp)
+//       }
+//     }
+//     const results = rows.map((row) => ({
+//       ...rowToRecord(row),
+//       latestResponse: responseMap.get(row.id) ?? null,
+//     }))
+//     res.json(results)
+//   } catch (err) {
+//     console.error('List invitations failed:', err)
+//     res.status(500).json({ error: 'Không tải được danh sách thư mời' })
+//   }
+// })
 router.get('/', async (_req, res) => {
   res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
   try {
+    // Tối ưu: Loại bỏ music_url, background_img, main_img nặng ra khỏi danh sách
     const { rows } = await pool.query<InvitationRow>(
-      'SELECT * FROM invitations ORDER BY created_at DESC',
+      `
+      SELECT 
+        id, graduate_name, recipient_name, date, time, time_end,
+        location_text, location_address, location_map, contact_info,
+        facebook_info, message, school_code, class_code, cohort_years,
+        major, created_at,
+        '' AS music_url, '' AS background_img, '' AS main_img
+      FROM invitations 
+      ORDER BY created_at DESC
+      `,
     )
     const { rows: responseRows } = await pool.query<{
       id: string
@@ -42,7 +89,6 @@ router.get('/', async (_req, res) => {
     res.status(500).json({ error: 'Không tải được danh sách thư mời' })
   }
 })
-
 router.get('/:id', async (req, res) => {
   res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
   try {
